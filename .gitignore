@@ -31,7 +31,10 @@ yarn-error.*
 *.pem
 
 # local env files
-.env*.local
+.env*
+
+# local build artifacts
+*.apk
 
 # typescript
 *.tsbuildinfo
@@ -46,5 +49,6 @@ attachments/
 *.pdf
 .agents
 .claude
+skills-lock.json
 # Brainstorming visual companion sessions
 .superpowers/

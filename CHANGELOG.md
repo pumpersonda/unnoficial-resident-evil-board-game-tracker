@@ -4,6 +4,42 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.1-alpha] - 2026-09-29
+
+### Security
+
+- Validated the persisted theme `mode` against the known theme whitelist (`THEME_NAMES` + `'system'`) before it is interpolated into the web build's inline bootstrap `<script>`, and switched to `JSON.stringify` instead of manual string interpolation (`components/ui/gluestack-ui-provider/index.web.tsx`)
+- Added a `version: 1` + `migrate` step to `themeStore` (`re-theme-store`) that validates the rehydrated theme mode against the same whitelist and falls back to `'dark'` if it's corrupted or foreign
+- Replaced `Math.random()`-only campaign ID generation with a collision-checked generator (`generateCampaignId`) in `campaignStore`
+- Hardened `campaignStore`'s persist `migrate` step against a malformed or foreign persisted blob missing `allCampaigns`, falling back to an empty campaign list instead of throwing
+- Fixed `resetCampaign()` to actually clear `allCampaigns` (previously only cleared `currentCampaignId`, contrary to its name and intended dev/testing use)
+- Broadened `.gitignore` to ignore all `.env*` files (was `.env*.local` only) and `*.apk` build artifacts
+
+## [0.2.0-alpha] - 2026-09-09
+
+### Added
+
+- GitHub Actions CI workflow running Prettier check, ESLint, `tsc --noEmit`, and Jest on push/PR, plus a pull request template
+- `.github/workflows/build-apk.yml` — manual (`workflow_dispatch`) CI job that builds a debug Android APK via `expo prebuild` + Gradle and uploads it as a build artifact
+- Jest unit tests for campaign creation and deletion (`tests/campaignCreation.test.ts`, `tests/campaignDeletion.test.ts`)
+- `CardsInfoModal`, and a unified `CardsTab` (renamed from `DiscardedCardsTab`) covering both added and discarded card piles, backed by `SelectCardModal`
+- Kerosene tracking for active characters, with an `updateActiveCharacterKerosene` action and `KEROSENE_MAX` constant
+- Redesigned Danger Level control: new `DangerLevelModal` and `DangerRing` dial components, `utils/dangerLevelGeometry.ts` geometry helpers, and Jest coverage (`tests/dangerLevel.test.ts`, `tests/dangerLevelGeometry.test.ts`)
+- `NavigationInfoModal` explaining scenario navigation and unlock rules
+- Explicit delete-confirmation dialogs for characters, cards, and item-box entries
+
+### Changed
+
+- Refreshed all RE1 static card data (encounter, mission, narrative, tension, item) from the reference spreadsheet, with corresponding `CardType`/`Item` type adjustments
+- Updated all character avatar images to higher-resolution artwork
+- Repositioned the Danger Level control within `CampaignHeader`
+- Upgraded to Expo SDK 57
+- Fixed multiple unnecessary re-renders and reformatted code with Prettier across the danger level and tab components
+
+### Fixed
+
+- Jest configuration issues (config file extension, test runner setup) preventing the unit test suite from running in CI
+
 ## [0.1.0-alpha] - 2026-08-12
 
 ### Added
