@@ -157,6 +157,7 @@ const SelectInput = React.forwardRef<React.ComponentRef<typeof UISelect.Input>, 
     const { size: parentSize, variant: parentVariant } = useStyleContext();
     return (
       <UISelect.Input
+        placeholderTextColorClassName="accent-foreground/50"
         className={selectInputStyle({
           class: className,
           parentVariants: {

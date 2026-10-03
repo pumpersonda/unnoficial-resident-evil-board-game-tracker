@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Redesigned all content modals (`CreateCampaignModal`, `SelectCharacterModal`, `AssignItemModal`, `SelectCardCategoryModal`, `AddItemModal`, `CharacterDetailsModal`, `SelectCardModal`, `EditCharacterModal`, `DangerLevelModal`) from partial centered dialogs into full-screen screens, sharing a new `components/shared/FullScreenModal.tsx` scaffold (centered header title, close button, slide-up/down animation, safe-area-aware header/footer, consistent default "Close" footer action)
 
+### Fixed
+
+- Fixed unreadable (dark/default-colored) placeholder text on `Input` and `Select` fields in dark theme by passing `placeholderTextColorClassName` with the Uniwind `accent-*` color prefix, since the native `TextInput`'s placeholder color isn't themeable through the web-only `placeholder:` Tailwind variant alone (`components/ui/input/index.tsx`, `components/ui/select/index.tsx`)
+
 ## [0.2.1-alpha] - 2026-09-29
 
 ### Security
