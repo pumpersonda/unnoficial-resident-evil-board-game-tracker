@@ -19,6 +19,16 @@ import { CreateCampaignForm } from '@/components/screens/CreateCampaignModal';
 import { getGameScenarios } from '@/data';
 import { DANGER_LEVEL_CONFIG } from '@/constants/dangerLevel';
 
+// Collision-checked local id — Math.random() alone has no uniqueness guarantee
+// against the campaigns already on this device.
+function generateCampaignId(existingCampaigns: Campaign[]): string {
+  let id: string;
+  do {
+    id = `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 9)}`;
+  } while (existingCampaigns.some(c => c.id === id));
+  return id;
+}
+
 interface CampaignStore {
   currentCampaignId: string | null;
   allCampaigns: Campaign[];
@@ -73,7 +83,7 @@ export const useCampaignStore = create<CampaignStore>()(
           }));
 
           const newCampaign: Campaign = {
-            id: Math.random().toString(36).substring(2, 9), // Simple local ID
+            id: generateCampaignId(state.allCampaigns),
             name: formData.name,
             game,
             difficulty: formData.difficulty,
@@ -110,7 +120,7 @@ export const useCampaignStore = create<CampaignStore>()(
             state.currentCampaignId === campaignId ? null : state.currentCampaignId,
         })),
 
-      resetCampaign: () => set({ currentCampaignId: null }),
+      resetCampaign: () => set({ currentCampaignId: null, allCampaigns: [] }),
 
       setDangerLevel: level =>
         set(state => ({
@@ -451,15 +461,18 @@ export const useCampaignStore = create<CampaignStore>()(
       name: 're-campaign-store',
       storage: createJSONStorage(() => AsyncStorage),
       version: 1,
-      migrate: (persistedState) => {
-        const state = persistedState as CampaignStore;
+      migrate: persistedState => {
+        const state = persistedState as Partial<CampaignStore> | undefined;
+        // A foreign or much-older persisted blob may be missing allCampaigns
+        // entirely — fall back to an empty campaign list instead of throwing.
+        const allCampaigns = Array.isArray(state?.allCampaigns) ? state.allCampaigns : [];
         return {
           ...state,
-          allCampaigns: state.allCampaigns.map(c => ({
+          allCampaigns: allCampaigns.map(c => ({
             ...c,
-            enabledExpansions: c.enabledExpansions ?? ['Core Box'],
+            enabledExpansions: c?.enabledExpansions ?? ['Core Box'],
           })),
-        };
+        } as CampaignStore;
       },
     }
   )
