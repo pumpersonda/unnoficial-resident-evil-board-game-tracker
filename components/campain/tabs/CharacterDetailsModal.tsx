@@ -1,19 +1,10 @@
 import React from 'react';
 import { Image, View } from 'react-native';
-import {
-  Modal,
-  ModalBackdrop,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-} from '@/components/ui/modal';
-import { Button, ButtonText } from '@/components/ui/button';
+import { FullScreenModal } from '@/components/shared/FullScreenModal';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
-import { Droplet, X } from 'lucide-react-native';
+import { Droplet } from 'lucide-react-native';
 import {
   ActiveCharacter,
   Campaign,
@@ -23,8 +14,6 @@ import {
   KEROSENE_COLOR,
   KEROSENE_MAX,
 } from '@/types';
-import { useResolvedTheme } from '@/hooks/useResolvedTheme';
-import { THEME_COLORS } from '@/constants/theme';
 
 interface CharacterDetailsModalProps {
   isOpen: boolean;
@@ -39,116 +28,94 @@ export const CharacterDetailsModal: React.FC<CharacterDetailsModalProps> = ({
   campaign,
   activeCharacter,
 }) => {
-  const resolvedTheme = useResolvedTheme();
-
   if (!activeCharacter) return null;
 
   const showKerosene = campaign.game === GameVersion.RE1 && activeCharacter.kerosene !== undefined;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md">
-      <ModalBackdrop />
-      <ModalContent className="bg-card h-[85%] flex-col">
-        <ModalHeader className="pb-3">
-          <Text className="text-foreground text-xl font-semibold">
-            {activeCharacter.character.name}
-          </Text>
-          <ModalCloseButton>
-            <X color={THEME_COLORS[resolvedTheme].mutedForeground} size={20} />
-          </ModalCloseButton>
-        </ModalHeader>
-
-        <ModalBody className="flex-1 mt-0 mb-0" scrollEnabled showsVerticalScrollIndicator={false}>
-          <VStack space="lg" className="pb-4">
-            <HStack space="md" className="items-center">
-              <Image
-                source={activeCharacter.character.avatar}
-                className="w-16 h-16 rounded-full bg-muted"
-              />
-              <VStack className="flex-1">
-                <HStack space="sm" className="items-center">
-                  <Text className="text-foreground font-semibold text-lg">
-                    {activeCharacter.character.name}
-                  </Text>
-                  {activeCharacter.isAdvancedVersion && (
-                    <Text className="text-destructive text-xs font-semibold px-2 py-0.5 border border-destructive rounded-full">
-                      Advanced
-                    </Text>
-                  )}
-                </HStack>
-                <HStack space="xs" className="items-center">
-                  <View
-                    className="w-2.5 h-2.5 rounded-full"
-                    style={{ backgroundColor: getHealthColor(activeCharacter.health) }}
-                  />
-                  <Text className="text-muted-foreground text-sm">
-                    {HEALTH_LABELS[activeCharacter.health.value]}
-                    {activeCharacter.health.isPoisoned ? ' · Poisoned' : ''}
-                  </Text>
-                </HStack>
-              </VStack>
-            </HStack>
-
-            <VStack space="sm">
-              <Text className="text-foreground font-semibold">Player Name</Text>
-              <Text className="text-muted-foreground">
-                {activeCharacter.controlledBy.realName || '—'}
+    <FullScreenModal isOpen={isOpen} onClose={onClose} title={activeCharacter.character.name}>
+      <VStack space="lg" className="pb-4">
+        <HStack space="md" className="items-center">
+          <Image
+            source={activeCharacter.character.avatar}
+            className="w-16 h-16 rounded-full bg-muted"
+          />
+          <VStack className="flex-1">
+            <HStack space="sm" className="items-center">
+              <Text className="text-foreground font-semibold text-lg">
+                {activeCharacter.character.name}
               </Text>
-            </VStack>
-
-            {showKerosene && (
-              <VStack space="sm">
-                <Text className="text-foreground font-semibold">Kerosene</Text>
-                <HStack space="xs" className="items-center">
-                  <Droplet color={KEROSENE_COLOR} size={16} />
-                  <Text className="text-muted-foreground">
-                    {activeCharacter.kerosene}/{KEROSENE_MAX}
-                  </Text>
-                </HStack>
-              </VStack>
-            )}
-
-            <VStack space="sm">
-              <Text className="text-foreground font-semibold">Inventory</Text>
-
-              {activeCharacter.inventory.length === 0 ? (
-                <Text className="text-muted-foreground text-sm">No items assigned yet.</Text>
-              ) : (
-                <VStack className="bg-background border border-border rounded-xl overflow-hidden">
-                  {activeCharacter.inventory.map((item, index) => {
-                    const isLast = index === activeCharacter.inventory.length - 1;
-
-                    return (
-                      <HStack
-                        key={item.id}
-                        className={`items-center justify-between gap-3 px-3 py-3 ${
-                          isLast ? '' : 'border-b border-b-border'
-                        }`}
-                      >
-                        <VStack className="flex-1">
-                          <Text className="text-foreground font-medium" numberOfLines={1}>
-                            {item.name}
-                          </Text>
-                          <Text className="text-muted-foreground text-xs capitalize">
-                            {item.itemType}
-                          </Text>
-                        </VStack>
-                        <Text className="text-muted-foreground text-xs">x{item.quantity}</Text>
-                      </HStack>
-                    );
-                  })}
-                </VStack>
+              {activeCharacter.isAdvancedVersion && (
+                <Text className="text-destructive text-xs font-semibold px-2 py-0.5 border border-destructive rounded-full">
+                  Advanced
+                </Text>
               )}
-            </VStack>
+            </HStack>
+            <HStack space="xs" className="items-center">
+              <View
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ backgroundColor: getHealthColor(activeCharacter.health) }}
+              />
+              <Text className="text-muted-foreground text-sm">
+                {HEALTH_LABELS[activeCharacter.health.value]}
+                {activeCharacter.health.isPoisoned ? ' · Poisoned' : ''}
+              </Text>
+            </HStack>
           </VStack>
-        </ModalBody>
+        </HStack>
 
-        <ModalFooter className="pt-3">
-          <Button className="flex-1 bg-secondary active:opacity-90" onPress={onClose}>
-            <ButtonText className="text-secondary-foreground">Close</ButtonText>
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        <VStack space="sm">
+          <Text className="text-foreground font-semibold">Player Name</Text>
+          <Text className="text-muted-foreground">
+            {activeCharacter.controlledBy.realName || '—'}
+          </Text>
+        </VStack>
+
+        {showKerosene && (
+          <VStack space="sm">
+            <Text className="text-foreground font-semibold">Kerosene</Text>
+            <HStack space="xs" className="items-center">
+              <Droplet color={KEROSENE_COLOR} size={16} />
+              <Text className="text-muted-foreground">
+                {activeCharacter.kerosene}/{KEROSENE_MAX}
+              </Text>
+            </HStack>
+          </VStack>
+        )}
+
+        <VStack space="sm">
+          <Text className="text-foreground font-semibold">Inventory</Text>
+
+          {activeCharacter.inventory.length === 0 ? (
+            <Text className="text-muted-foreground text-sm">No items assigned yet.</Text>
+          ) : (
+            <VStack className="bg-background border border-border rounded-xl overflow-hidden">
+              {activeCharacter.inventory.map((item, index) => {
+                const isLast = index === activeCharacter.inventory.length - 1;
+
+                return (
+                  <HStack
+                    key={item.id}
+                    className={`items-center justify-between gap-3 px-3 py-3 ${
+                      isLast ? '' : 'border-b border-b-border'
+                    }`}
+                  >
+                    <VStack className="flex-1">
+                      <Text className="text-foreground font-medium" numberOfLines={1}>
+                        {item.name}
+                      </Text>
+                      <Text className="text-muted-foreground text-xs capitalize">
+                        {item.itemType}
+                      </Text>
+                    </VStack>
+                    <Text className="text-muted-foreground text-xs">x{item.quantity}</Text>
+                  </HStack>
+                );
+              })}
+            </VStack>
+          )}
+        </VStack>
+      </VStack>
+    </FullScreenModal>
   );
 };

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
-import { Minus, Plus, X } from 'lucide-react-native';
-import { Modal, ModalBackdrop, ModalContent } from '@/components/ui/modal';
+import { Minus, Plus } from 'lucide-react-native';
+import { FullScreenModal } from '@/components/shared/FullScreenModal';
 import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 import { HStack } from '@/components/ui/hstack';
@@ -92,92 +92,80 @@ export const DangerLevelModal: React.FC<DangerLevelModalProps> = ({
   const currentColor = getDangerLevelColor(campaign.game, liveValue) ?? 'Green';
   const ringColor = getDangerRingColor(currentColor, resolvedTheme);
   const trackColor = THEME_COLORS[resolvedTheme].track;
-  const mutedIconColor = THEME_COLORS[resolvedTheme].mutedForeground;
 
   const thumbOffset = valueToThumbOffset(liveValue, config.maxLevel, thumbRadius);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="full">
-      <ModalBackdrop />
-      <ModalContent className="bg-background h-full w-full rounded-none border-0 items-center justify-center">
-        <Pressable
-          onPress={onClose}
-          accessibilityLabel="Close danger level editor"
-          className="absolute top-14 right-6 p-2 active:opacity-70"
-        >
-          <X color={mutedIconColor} size={24} />
-        </Pressable>
+    <FullScreenModal isOpen={isOpen} onClose={onClose} title="Danger Level" scrollEnabled={false}>
+      <VStack space="2xl" className="flex-1 items-center justify-center">
+        <GestureDetector gesture={panGesture}>
+          <View style={{ width: RING_SIZE, height: RING_SIZE }}>
+            <DangerRing
+              value={liveValue}
+              max={config.maxLevel}
+              size={RING_SIZE}
+              strokeWidth={RING_STROKE}
+              color={ringColor}
+              trackColor={trackColor}
+              animate={!isDragging}
+            />
+            <View
+              pointerEvents="none"
+              style={{
+                position: 'absolute',
+                width: THUMB_SIZE,
+                height: THUMB_SIZE,
+                borderRadius: THUMB_SIZE / 2,
+                backgroundColor: THEME_COLORS[resolvedTheme].background,
+                borderWidth: 3,
+                borderColor: ringColor,
+                left: center + thumbOffset.dx - THUMB_SIZE / 2,
+                top: center + thumbOffset.dy - THUMB_SIZE / 2,
+              }}
+            />
+          </View>
+        </GestureDetector>
 
-        <VStack space="2xl" className="items-center">
-          <GestureDetector gesture={panGesture}>
-            <View style={{ width: RING_SIZE, height: RING_SIZE }}>
-              <DangerRing
-                value={liveValue}
-                max={config.maxLevel}
-                size={RING_SIZE}
-                strokeWidth={RING_STROKE}
-                color={ringColor}
-                trackColor={trackColor}
-                animate={!isDragging}
-              />
-              <View
-                pointerEvents="none"
-                style={{
-                  position: 'absolute',
-                  width: THUMB_SIZE,
-                  height: THUMB_SIZE,
-                  borderRadius: THUMB_SIZE / 2,
-                  backgroundColor: THEME_COLORS[resolvedTheme].background,
-                  borderWidth: 3,
-                  borderColor: ringColor,
-                  left: center + thumbOffset.dx - THUMB_SIZE / 2,
-                  top: center + thumbOffset.dy - THUMB_SIZE / 2,
-                }}
-              />
-            </View>
-          </GestureDetector>
+        <HStack space="lg" className="items-center">
+          {config.bands.map((band, index) => {
+            const min = index === 0 ? 0 : config.bands[index - 1].max + 1;
+            return (
+              <HStack key={band.color} space="xs" className="items-center">
+                <View
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 4,
+                    backgroundColor: getDangerRingColor(band.color, resolvedTheme),
+                  }}
+                />
+                <Text className="text-muted-foreground text-xs">
+                  {min}–{band.max}
+                </Text>
+              </HStack>
+            );
+          })}
+        </HStack>
 
-          <HStack space="lg" className="items-center">
-            {config.bands.map((band, index) => {
-              const min = index === 0 ? 0 : config.bands[index - 1].max + 1;
-              return (
-                <HStack key={band.color} space="xs" className="items-center">
-                  <View
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: 4,
-                      backgroundColor: getDangerRingColor(band.color, resolvedTheme),
-                    }}
-                  />
-                  <Text className="text-muted-foreground text-xs">
-                    {min}–{band.max}
-                  </Text>
-                </HStack>
-              );
-            })}
-          </HStack>
-
-          <HStack space="3xl" className="items-center">
-            <Pressable
-              onPress={() => step(-1)}
-              disabled={liveValue <= 0}
-              accessibilityLabel="Decrease danger level"
-              className="w-14 h-14 rounded-full border border-border items-center justify-center active:opacity-70"
-            >
-              <Minus color={THEME_COLORS[resolvedTheme].foreground} size={24} />
-            </Pressable>
-            <Pressable
-              onPress={() => step(1)}
-              disabled={liveValue >= config.maxLevel}
-              accessibilityLabel="Increase danger level"
-              className="w-14 h-14 rounded-full border border-border items-center justify-center active:opacity-70"
-            >
-              <Plus color={THEME_COLORS[resolvedTheme].foreground} size={24} />
-            </Pressable>
-          </HStack>
-        </VStack>
-      </ModalContent>
-    </Modal>
+        <HStack space="3xl" className="items-center">
+          <Pressable
+            onPress={() => step(-1)}
+            disabled={liveValue <= 0}
+            accessibilityLabel="Decrease danger level"
+            className="w-14 h-14 rounded-full border border-border items-center justify-center active:opacity-70"
+          >
+            <Minus color={THEME_COLORS[resolvedTheme].foreground} size={24} />
+          </Pressable>
+          <Pressable
+            onPress={() => step(1)}
+            disabled={liveValue >= config.maxLevel}
+            accessibilityLabel="Increase danger level"
+            className="w-14 h-14 rounded-full border border-border items-center justify-center active:opacity-70"
+          >
+            <Plus color={THEME_COLORS[resolvedTheme].foreground} size={24} />
+          </Pressable>
+        </HStack>
+      </VStack>
+    </FullScreenModal>
   );
 };

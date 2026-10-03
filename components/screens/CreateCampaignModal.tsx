@@ -3,15 +3,7 @@ import { z } from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import {
-  Modal,
-  ModalBackdrop,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-} from '@/components/ui/modal';
+import { FullScreenModal } from '@/components/shared/FullScreenModal';
 
 import { Button, ButtonText } from '@/components/ui/button';
 
@@ -34,9 +26,6 @@ import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 
-import { X } from 'lucide-react-native';
-import { useResolvedTheme } from '@/hooks/useResolvedTheme';
-import { THEME_COLORS } from '@/constants/theme';
 import { Campaign, GameVersion } from '@/types';
 import { ENABLED_GAMES, GAME_LABELS, isGameEnabled } from '@/constants/gameVersions';
 
@@ -72,7 +61,6 @@ export default function CreateCampaignModal({
   onCreate,
   editingCampaign,
 }: CreateCampaignModalProps) {
-  const resolvedTheme = useResolvedTheme();
   const isEditing = !!editingCampaign;
   const {
     control,
@@ -106,117 +94,104 @@ export default function CreateCampaignModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md">
-      <ModalBackdrop />
-      <ModalContent className="bg-card">
-        <ModalHeader>
-          <Text className="text-foreground text-xl font-semibold">
-            {isEditing ? 'Edit Campaign' : 'Create New Campaign'}
-          </Text>
-          <ModalCloseButton>
-            <X color={THEME_COLORS[resolvedTheme].mutedForeground} size={20} />
-          </ModalCloseButton>
-        </ModalHeader>
+    <FullScreenModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={isEditing ? 'Edit Campaign' : 'Create New Campaign'}
+      footer={
+        <HStack space="md" className="w-full">
+          <Button variant="outline" className="flex-1 border-border" onPress={onClose}>
+            <ButtonText className="text-muted-foreground">Cancel</ButtonText>
+          </Button>
+          <Button
+            className="flex-1 bg-destructive active:opacity-90"
+            onPress={handleSubmit(onSubmit)}
+            isDisabled={!isValid}
+          >
+            <ButtonText>{isEditing ? 'Save Changes' : 'Create Campaign'}</ButtonText>
+          </Button>
+        </HStack>
+      }
+    >
+      <VStack space="lg">
+        {/* Name */}
+        <VStack space="xs">
+          <Text className="text-muted-foreground text-sm">Campaign Name</Text>
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { onChange, value } }) => (
+              <Input className="bg-background border-border border">
+                <InputField
+                  placeholder="Enter campaign name"
+                  value={value}
+                  onChangeText={onChange}
+                  className="text-foreground"
+                />
+              </Input>
+            )}
+          />
+          {errors.name && <Text className="text-destructive text-sm">{errors.name.message}</Text>}
+        </VStack>
 
-        <ModalBody>
-          <VStack space="lg">
-            {/* Name */}
-            <VStack space="xs">
-              <Text className="text-muted-foreground text-sm">Campaign Name</Text>
-              <Controller
-                control={control}
-                name="name"
-                render={({ field: { onChange, value } }) => (
-                  <Input className="bg-background border-border border">
-                    <InputField
-                      placeholder="Enter campaign name"
-                      value={value}
-                      onChangeText={onChange}
-                      className="text-foreground"
-                    />
-                  </Input>
-                )}
-              />
-              {errors.name && (
-                <Text className="text-destructive text-sm">{errors.name.message}</Text>
-              )}
-            </VStack>
+        {/* Game Version */}
+        <VStack space="xs">
+          <Text className="text-muted-foreground text-sm">Game Version</Text>
+          <Controller
+            control={control}
+            name="gameVersion"
+            render={({ field: { onChange, value } }) => (
+              <Select selectedValue={value} onValueChange={onChange} isDisabled={isEditing}>
+                <SelectTrigger
+                  className={`bg-background border-border${isEditing ? ' opacity-50' : ''}`}
+                >
+                  <SelectInput placeholder="Select version" className="text-foreground" />
+                  <SelectIcon />
+                </SelectTrigger>
+                <SelectPortal>
+                  <SelectBackdrop />
+                  <SelectContent className="bg-card">
+                    <SelectDragIndicatorWrapper>
+                      <SelectDragIndicator />
+                    </SelectDragIndicatorWrapper>
+                    {ENABLED_GAMES.map(game => (
+                      <SelectItem key={game} label={GAME_LABELS[game]} value={game} />
+                    ))}
+                  </SelectContent>
+                </SelectPortal>
+              </Select>
+            )}
+          />
+        </VStack>
 
-            {/* Game Version */}
-            <VStack space="xs">
-              <Text className="text-muted-foreground text-sm">Game Version</Text>
-              <Controller
-                control={control}
-                name="gameVersion"
-                render={({ field: { onChange, value } }) => (
-                  <Select selectedValue={value} onValueChange={onChange} isDisabled={isEditing}>
-                    <SelectTrigger
-                      className={`bg-background border-border${isEditing ? ' opacity-50' : ''}`}
-                    >
-                      <SelectInput placeholder="Select version" className="text-foreground" />
-                      <SelectIcon />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent className="bg-card">
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        {ENABLED_GAMES.map(game => (
-                          <SelectItem key={game} label={GAME_LABELS[game]} value={game} />
-                        ))}
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
-                )}
-              />
-            </VStack>
-
-            {/* Difficulty */}
-            <VStack space="xs">
-              <Text className="text-muted-foreground text-sm">Difficulty</Text>
-              <Controller
-                control={control}
-                name="difficulty"
-                render={({ field: { onChange, value } }) => (
-                  <Select selectedValue={value} onValueChange={onChange}>
-                    <SelectTrigger className="bg-background border-border">
-                      <SelectInput placeholder="Select difficulty" className="text-foreground" />
-                      <SelectIcon />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent className="bg-card">
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        <SelectItem label="Easy" value="Easy" />
-                        <SelectItem label="Normal" value="Normal" />
-                        <SelectItem label="Hard" value="Hard" />
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
-                )}
-              />
-            </VStack>
-          </VStack>
-        </ModalBody>
-
-        <ModalFooter>
-          <HStack space="md" className="w-full">
-            <Button variant="outline" className="flex-1 border-border" onPress={onClose}>
-              <ButtonText className="text-muted-foreground">Cancel</ButtonText>
-            </Button>
-            <Button
-              className="flex-1 bg-destructive active:opacity-90"
-              onPress={handleSubmit(onSubmit)}
-              isDisabled={!isValid}
-            >
-              <ButtonText>{isEditing ? 'Save Changes' : 'Create Campaign'}</ButtonText>
-            </Button>
-          </HStack>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        {/* Difficulty */}
+        <VStack space="xs">
+          <Text className="text-muted-foreground text-sm">Difficulty</Text>
+          <Controller
+            control={control}
+            name="difficulty"
+            render={({ field: { onChange, value } }) => (
+              <Select selectedValue={value} onValueChange={onChange}>
+                <SelectTrigger className="bg-background border-border">
+                  <SelectInput placeholder="Select difficulty" className="text-foreground" />
+                  <SelectIcon />
+                </SelectTrigger>
+                <SelectPortal>
+                  <SelectBackdrop />
+                  <SelectContent className="bg-card">
+                    <SelectDragIndicatorWrapper>
+                      <SelectDragIndicator />
+                    </SelectDragIndicatorWrapper>
+                    <SelectItem label="Easy" value="Easy" />
+                    <SelectItem label="Normal" value="Normal" />
+                    <SelectItem label="Hard" value="Hard" />
+                  </SelectContent>
+                </SelectPortal>
+              </Select>
+            )}
+          />
+        </VStack>
+      </VStack>
+    </FullScreenModal>
   );
 }
