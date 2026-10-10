@@ -1,6 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { FullScreenModal } from '@/components/shared/FullScreenModal';
+import { ItemCategoryBadge } from '@/components/shared/ItemCategoryBadge';
+import { ItemIcon } from '@/components/shared/ItemIcon';
 import { Button, ButtonText } from '@/components/ui/button';
+import { HStack } from '@/components/ui/hstack';
 import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
@@ -8,6 +11,7 @@ import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
 import { Search, X } from 'lucide-react-native';
 import { GameVersion, Item } from '@/types';
 import { getGameCards } from '@/data';
+import { groupItemsByCategory } from '@/utils/items';
 
 interface AddItemModalProps {
   isOpen: boolean;
@@ -26,6 +30,8 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, gam
     if (!normalizedQuery) return items;
     return items.filter(item => item.name.toLowerCase().includes(normalizedQuery));
   }, [items, normalizedQuery]);
+
+  const groupedItems = useMemo(() => groupItemsByCategory(visibleItems), [visibleItems]);
 
   const handleClose = () => {
     setQuery('');
@@ -73,25 +79,42 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, gam
             </Text>
           </VStack>
         ) : (
-          <VStack className="bg-background border border-border rounded-xl overflow-hidden">
-            {visibleItems.map((item, index) => {
-              const isLast = index === visibleItems.length - 1;
+          <VStack space="lg">
+            {groupedItems.map(([category, group]) => (
+              <VStack key={category} space="sm">
+                <Text className="text-foreground text-lg font-bold">Category {category}</Text>
+                <VStack className="bg-background border border-border rounded-xl overflow-hidden">
+                  {group.map((item, index) => {
+                    const isLast = index === group.length - 1;
 
-              return (
-                <Pressable
-                  key={item.id}
-                  onPress={() => onAddItem({ ...item, quantity: 1 })}
-                  className={`flex-row items-center justify-between gap-3 px-3 py-3 active:bg-muted/40 ${
-                    isLast ? '' : 'border-b border-b-border'
-                  }`}
-                >
-                  <Text className="text-foreground font-medium flex-1" numberOfLines={1}>
-                    {item.name}
-                  </Text>
-                  <Text className="text-muted-foreground text-xs">{item.category}</Text>
-                </Pressable>
-              );
-            })}
+                    return (
+                      <Pressable
+                        key={item.id}
+                        onPress={() => onAddItem({ ...item, quantity: 1 })}
+                        className={`flex-row items-center justify-between gap-3 px-3 py-3 active:bg-muted/40 ${
+                          isLast ? '' : 'border-b border-b-border'
+                        }`}
+                      >
+                        <HStack className="items-center gap-3 flex-1">
+                          <ItemIcon item={item} />
+                          <HStack className="items-center gap-2 flex-1">
+                            <Text className="text-foreground font-medium flex-1" numberOfLines={1}>
+                              {item.name}
+                            </Text>
+                            {item.specialId !== undefined && (
+                              <Text className="text-muted-foreground text-xs">
+                                #{item.specialId}
+                              </Text>
+                            )}
+                          </HStack>
+                        </HStack>
+                        <ItemCategoryBadge category={category} />
+                      </Pressable>
+                    );
+                  })}
+                </VStack>
+              </VStack>
+            ))}
           </VStack>
         )}
       </VStack>

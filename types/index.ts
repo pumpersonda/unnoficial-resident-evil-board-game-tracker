@@ -1,3 +1,4 @@
+import { ImageSourcePropType } from 'react-native';
 import { CharacterProfile } from '@/data/RE1/characters';
 
 // Single source of truth for registered UniWind themes.
@@ -76,6 +77,7 @@ export interface Item extends Card {
   itemType: ItemType;
   category: ItemCategory;
   ammunition?: number;
+  image?: ImageSourcePropType;
 }
 
 export interface ActiveCharacter {

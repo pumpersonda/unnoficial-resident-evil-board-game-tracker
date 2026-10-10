@@ -5,6 +5,8 @@ import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { Card } from '@/components/ui/card';
 import { Pressable } from '@/components/ui/pressable';
+import { ItemCategoryBadge } from '@/components/shared/ItemCategoryBadge';
+import { ItemIcon } from '@/components/shared/ItemIcon';
 import { Campaign, Item, ItemCategory, ItemType } from '@/types';
 import { useCampaignStore } from '@/store/campaignStore';
 import { Minus, Plus, Trash2 } from 'lucide-react-native';
@@ -142,24 +144,37 @@ export const ItemBoxTab: React.FC<ItemBoxTabProps> = ({ campaign }) => {
                       className="bg-card border border-border p-4 rounded-2xl text-center"
                     >
                       <HStack className="justify-between items-start">
-                        <VStack className="flex-1">
-                          <Text className="text-foreground font-semibold">{item.name}</Text>
-                          <Text className="text-muted-foreground text-sm capitalize">
-                            {item.itemType}
-                          </Text>
-                          {holders.length > 0 && (
-                            <HStack className="flex-wrap gap-1 mt-2">
-                              {holders.map((holder, index) => (
-                                <Text
-                                  key={`${holder.characterName}-${index}`}
-                                  className="text-muted-foreground text-xs font-semibold px-2 py-0.5 border border-border rounded-full"
-                                >
-                                  {holder.characterName} x{holder.quantity}
+                        <HStack className="flex-1 gap-3">
+                          <ItemIcon item={item} />
+                          <VStack className="flex-1">
+                            <HStack className="items-center gap-2">
+                              <Text className="text-foreground font-semibold flex-1" numberOfLines={1}>
+                                {item.name}
+                              </Text>
+                              {item.specialId !== undefined && (
+                                <Text className="text-muted-foreground text-xs">
+                                  #{item.specialId}
                                 </Text>
-                              ))}
+                              )}
+                              <ItemCategoryBadge category={category} />
                             </HStack>
-                          )}
-                        </VStack>
+                            <Text className="text-muted-foreground text-sm capitalize">
+                              {item.itemType}
+                            </Text>
+                            {holders.length > 0 && (
+                              <HStack className="flex-wrap gap-1 mt-2">
+                                {holders.map((holder, index) => (
+                                  <Text
+                                    key={`${holder.characterName}-${index}`}
+                                    className="text-muted-foreground text-xs font-semibold px-2 py-0.5 border border-border rounded-full"
+                                  >
+                                    {holder.characterName} x{holder.quantity}
+                                  </Text>
+                                ))}
+                              </HStack>
+                            )}
+                          </VStack>
+                        </HStack>
                         <Text className="text-muted-foreground font-semibold ml-2">
                           x{boxQuantity}
                         </Text>

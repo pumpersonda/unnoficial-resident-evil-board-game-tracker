@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Items are now grouped and sorted by category (S, A, B, C) in `AddItemModal`, `AssignItemModal`, and `ItemBoxTab`, with a shared color-coded `ItemCategoryBadge` (gray/blue/red/green) and the card's `specialId` shown when present
+- Optional `image` field on `Item` plus a shared `ItemIcon` component (image with a package-icon fallback) rendered before the item name in `AddItemModal`, `AssignItemModal`, and `ItemBoxTab`
+
 ### Changed
 
 - Added horizontal swipe/slide navigation between campaign tabs (Summary, Characters, Item Box, Cards, Scenarios) in `CurrentCampaignScreen`, backed by a paginated `ScrollView` synced with `CampaignTabBar`, with each tab's content lazily mounted on first visit
