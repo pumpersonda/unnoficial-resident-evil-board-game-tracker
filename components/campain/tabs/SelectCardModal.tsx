@@ -7,8 +7,15 @@ import { VStack } from '@/components/ui/vstack';
 import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
 import { Search, X } from 'lucide-react-native';
 import { Card as CardModel, CardType, GameVersion } from '@/types';
+import { TensionCard } from '@/data/RE1/tension';
 import { getGameCards } from '@/data';
-import { isTensionCard, TENSION_ACCENT_CLASSES } from './tensionCardDisplay';
+import {
+  groupByTensionColor,
+  isTensionCard,
+  TENSION_ACCENT_CLASSES,
+  TENSION_TEXT_CLASSES,
+} from './tensionCardDisplay';
+import { sortBySpecialId } from '@/utils/cards';
 
 interface SelectCardModalProps {
   isOpen: boolean;
@@ -37,12 +44,45 @@ export const SelectCardModal: React.FC<SelectCardModalProps> = ({
     return cards.filter(card => card.name.toLowerCase().includes(normalizedQuery));
   }, [cards, normalizedQuery]);
 
+  const groupedTensionCards = useMemo(() => {
+    if (cardType !== 'Tension') return null;
+    return groupByTensionColor(visibleCards, card => (card as TensionCard).color).map(
+      ([color, group]) => [color, sortBySpecialId(group, card => card.specialId)] as const
+    );
+  }, [cardType, visibleCards]);
+
+  const sortedVisibleCards = useMemo(
+    () => sortBySpecialId(visibleCards, card => card.specialId),
+    [visibleCards]
+  );
+
   const handleClose = () => {
     setQuery('');
     onClose();
   };
 
   const actionLabel = mode === 'added' ? 'Add' : 'Discard';
+
+  const renderCardRow = (card: CardModel, isLast: boolean) => {
+    const accentClass = isTensionCard(card) ? TENSION_ACCENT_CLASSES[card.color] : 'border-l-border';
+
+    return (
+      <Pressable
+        key={card.id}
+        onPress={() => onSelect(cardType, { ...card, quantity: 1 })}
+        className={`flex-row items-center justify-between gap-3 border-l-4 ${accentClass} px-3 py-3 active:bg-muted/40 ${
+          isLast ? '' : 'border-b border-b-border'
+        }`}
+      >
+        <Text className="text-foreground font-medium flex-1" numberOfLines={1}>
+          {card.name}
+        </Text>
+        {card.specialId !== undefined && (
+          <Text className="text-muted-foreground text-xs">#{card.specialId}</Text>
+        )}
+      </Pressable>
+    );
+  };
 
   return (
     <FullScreenModal
@@ -84,28 +124,24 @@ export const SelectCardModal: React.FC<SelectCardModalProps> = ({
                 : 'No card data available for this category yet.'}
             </Text>
           </VStack>
+        ) : groupedTensionCards ? (
+          <VStack space="lg">
+            {groupedTensionCards.map(([color, group]) => (
+              <VStack key={color} space="sm">
+                <Text className={`text-base font-bold ${TENSION_TEXT_CLASSES[color]}`}>
+                  {color}
+                </Text>
+                <VStack className="bg-background border border-border rounded-xl overflow-hidden">
+                  {group.map((card, index) => renderCardRow(card, index === group.length - 1))}
+                </VStack>
+              </VStack>
+            ))}
+          </VStack>
         ) : (
           <VStack className="bg-background border border-border rounded-xl overflow-hidden">
-            {visibleCards.map((card, index) => {
-              const accentClass = isTensionCard(card)
-                ? TENSION_ACCENT_CLASSES[card.color]
-                : 'border-l-border';
-              const isLast = index === visibleCards.length - 1;
-
-              return (
-                <Pressable
-                  key={card.id}
-                  onPress={() => onSelect(cardType, { ...card, quantity: 1 })}
-                  className={`flex-row items-center justify-between gap-3 border-l-4 ${accentClass} px-3 py-3 active:bg-muted/40 ${
-                    isLast ? '' : 'border-b border-b-border'
-                  }`}
-                >
-                  <Text className="text-foreground font-medium flex-1" numberOfLines={1}>
-                    {card.name}
-                  </Text>
-                </Pressable>
-              );
-            })}
+            {sortedVisibleCards.map((card, index) =>
+              renderCardRow(card, index === sortedVisibleCards.length - 1)
+            )}
           </VStack>
         )}
       </VStack>

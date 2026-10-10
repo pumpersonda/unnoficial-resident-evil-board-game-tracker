@@ -6,10 +6,17 @@ import { Text } from '@/components/ui/text';
 import { Card } from '@/components/ui/card';
 import { Pressable } from '@/components/ui/pressable';
 import { Campaign, Card as CardModel, CardType } from '@/types';
+import { TensionCard } from '@/data/RE1/tension';
 import { getGameCardData } from '@/data';
 import { useCampaignStore } from '@/store/campaignStore';
 import { Info, Plus, Trash2 } from 'lucide-react-native';
-import { isTensionCard, TENSION_ACCENT_CLASSES } from './tensionCardDisplay';
+import {
+  groupByTensionColor,
+  isTensionCard,
+  TENSION_ACCENT_CLASSES,
+  TENSION_TEXT_CLASSES,
+} from './tensionCardDisplay';
+import { sortBySpecialId } from '@/utils/cards';
 import { SelectCardModal } from './SelectCardModal';
 import { SelectCardCategoryModal } from './SelectCardCategoryModal';
 import { CardsInfoModal } from './CardsInfoModal';
@@ -80,6 +87,44 @@ export const CardsTab: React.FC<CardsTabProps> = ({ campaign }) => {
     });
   };
 
+  const resolveCard = (cardType: CardType, card: CardModel) =>
+    getGameCardData(campaign.game, cardType, card.id) ?? card;
+
+  const renderCardEntry = (cardType: CardType, card: CardModel) => {
+    const resolved = resolveCard(cardType, card);
+    const accentClass = isTensionCard(resolved)
+      ? TENSION_ACCENT_CLASSES[resolved.color]
+      : 'border-l-border';
+
+    return (
+      <Card
+        key={card.id}
+        className={`bg-card border border-border border-l-4 ${accentClass} p-4 rounded-2xl text-center`}
+      >
+        <HStack className="justify-between items-start">
+          <HStack className="items-center gap-2 flex-1">
+            <Text className="text-foreground font-semibold flex-1">{resolved.name}</Text>
+            {resolved.specialId !== undefined && (
+              <Text className="text-muted-foreground text-xs">#{resolved.specialId}</Text>
+            )}
+          </HStack>
+          <Text className="text-muted-foreground font-semibold ml-2">x{card.quantity}</Text>
+          <Pressable
+            onPress={() => handleRequestDeleteCard(cardType, card.id, resolved.name)}
+            className="px-3 rounded-full active:bg-destructive/10"
+            accessibilityLabel="Eliminar carta"
+          >
+            <Trash2 color="gray" size={20} />
+          </Pressable>
+        </HStack>
+
+        {isTensionCard(resolved) && (
+          <Text className="text-muted-foreground text-sm mt-1 italic">{resolved.quote}</Text>
+        )}
+      </Card>
+    );
+  };
+
   const handleRequestDeleteCard = (cardType: CardType, cardId: string, cardName: string) => {
     setCardPendingRemoval({ cardType, id: cardId, name: cardName });
   };
@@ -142,47 +187,40 @@ export const CardsTab: React.FC<CardsTabProps> = ({ campaign }) => {
           </VStack>
         ) : (
           <VStack space="lg" className="pb-24">
-            {nonEmptyCategories.map(([cardType, cards]) => (
-              <VStack key={cardType} space="sm">
-                <Text className="text-foreground text-xl font-bold">{cardType}</Text>
+            {nonEmptyCategories.map(([cardType, cards]) => {
+              if (cardType === 'Tension') {
+                const colorGroups = groupByTensionColor(
+                  cards,
+                  card => (resolveCard(cardType, card) as TensionCard).color
+                );
 
-                {cards.map(card => {
-                  const resolved = getGameCardData(campaign.game, cardType, card.id) ?? card;
-                  const accentClass = isTensionCard(resolved)
-                    ? TENSION_ACCENT_CLASSES[resolved.color]
-                    : 'border-l-border';
+                return (
+                  <VStack key={cardType} space="md">
+                    <Text className="text-foreground text-xl font-bold">{cardType}</Text>
 
-                  return (
-                    <Card
-                      key={card.id}
-                      className={`bg-card border border-border border-l-4 ${accentClass} p-4 rounded-2xl text-center`}
-                    >
-                      <HStack className="justify-between items-start">
-                        <Text className="text-foreground font-semibold flex-1">
-                          {resolved.name}
+                    {colorGroups.map(([color, groupCards]) => (
+                      <VStack key={color} space="sm">
+                        <Text className={`text-base font-bold ${TENSION_TEXT_CLASSES[color]}`}>
+                          {color}
                         </Text>
-                        <Text className="text-muted-foreground font-semibold ml-2">
-                          x{card.quantity}
-                        </Text>
-                        <Pressable
-                          onPress={() => handleRequestDeleteCard(cardType, card.id, resolved.name)}
-                          className="px-3 rounded-full active:bg-destructive/10"
-                          accessibilityLabel="Eliminar carta"
-                        >
-                          <Trash2 color="gray" size={20} />
-                        </Pressable>
-                      </HStack>
+                        {sortBySpecialId(groupCards, card => resolveCard(cardType, card).specialId).map(
+                          card => renderCardEntry(cardType, card)
+                        )}
+                      </VStack>
+                    ))}
+                  </VStack>
+                );
+              }
 
-                      {isTensionCard(resolved) && (
-                        <Text className="text-muted-foreground text-sm mt-1 italic">
-                          {resolved.quote}
-                        </Text>
-                      )}
-                    </Card>
-                  );
-                })}
-              </VStack>
-            ))}
+              return (
+                <VStack key={cardType} space="sm">
+                  <Text className="text-foreground text-xl font-bold">{cardType}</Text>
+                  {sortBySpecialId(cards, card => resolveCard(cardType, card).specialId).map(
+                    card => renderCardEntry(cardType, card)
+                  )}
+                </VStack>
+              );
+            })}
           </VStack>
         )}
       </ScrollView>

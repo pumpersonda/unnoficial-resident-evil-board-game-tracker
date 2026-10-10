@@ -10,6 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Items are now grouped and sorted by category (S, A, B, C) in `AddItemModal`, `AssignItemModal`, and `ItemBoxTab`, with a shared color-coded `ItemCategoryBadge` (gray/blue/red/green) and the card's `specialId` shown when present
 - Optional `image` field on `Item` plus a shared `ItemIcon` component (image with a package-icon fallback) rendered before the item name in `AddItemModal`, `AssignItemModal`, and `ItemBoxTab`
+- Tension cards in `CardsTab` (Added/Discarded) and `SelectCardModal` are now grouped and sorted by color, in the order Green, Amber, Red, via a shared `groupByTensionColor` helper and color-coded group headers (`tensionCardDisplay.ts`)
+- Tension, Encounter, Mission, and Narrative cards now show their `specialId` next to the name in `CardsTab` and `SelectCardModal`, same style as items
+- Cards within every group (each Tension color group, and each flat card-type category) are sorted ascending by `specialId` using a new shared `sortBySpecialId` helper (`utils/cards.ts`)
 
 ### Changed
 
