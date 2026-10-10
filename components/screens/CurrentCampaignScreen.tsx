@@ -1,5 +1,11 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { NativeScrollEvent, NativeSyntheticEvent, ScrollView, useWindowDimensions, View } from 'react-native';
+import {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollView,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { VStack } from '@/components/ui/vstack';
 import { Text } from '@/components/ui/text';
 import { useCurrentCampaign } from '@/store/campaignStore';
