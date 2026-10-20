@@ -21,7 +21,7 @@ export function groupByTensionColor<T>(
   items: T[],
   getColor: (item: T) => TensionColor
 ): [TensionColor, T[]][] {
-  return TENSION_COLOR_ORDER
-    .map(color => [color, items.filter(item => getColor(item) === color)] as [TensionColor, T[]])
-    .filter(([, group]) => group.length > 0);
+  return TENSION_COLOR_ORDER.map(
+    color => [color, items.filter(item => getColor(item) === color)] as [TensionColor, T[]]
+  ).filter(([, group]) => group.length > 0);
 }

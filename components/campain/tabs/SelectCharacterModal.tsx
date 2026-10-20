@@ -175,7 +175,9 @@ export const SelectCharacterModal: React.FC<SelectCharacterModalProps> = ({
                         className="bg-destructive active:opacity-90"
                         onPress={() => handleConfirm(character)}
                       >
-                        <ButtonText>{placingInReserve ? 'Add to Reserve' : 'Add to Roster'}</ButtonText>
+                        <ButtonText>
+                          {placingInReserve ? 'Add to Reserve' : 'Add to Roster'}
+                        </ButtonText>
                       </Button>
                     </VStack>
                   )}

@@ -64,7 +64,9 @@ export const SelectCardModal: React.FC<SelectCardModalProps> = ({
   const actionLabel = mode === 'added' ? 'Add' : 'Discard';
 
   const renderCardRow = (card: CardModel, isLast: boolean) => {
-    const accentClass = isTensionCard(card) ? TENSION_ACCENT_CLASSES[card.color] : 'border-l-border';
+    const accentClass = isTensionCard(card)
+      ? TENSION_ACCENT_CLASSES[card.color]
+      : 'border-l-border';
 
     return (
       <Pressable

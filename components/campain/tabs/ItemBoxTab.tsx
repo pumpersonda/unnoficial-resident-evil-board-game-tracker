@@ -148,7 +148,10 @@ export const ItemBoxTab: React.FC<ItemBoxTabProps> = ({ campaign }) => {
                           <ItemIcon item={item} />
                           <VStack className="flex-1">
                             <HStack className="items-center gap-2">
-                              <Text className="text-foreground font-semibold flex-1" numberOfLines={1}>
+                              <Text
+                                className="text-foreground font-semibold flex-1"
+                                numberOfLines={1}
+                              >
                                 {item.name}
                               </Text>
                               {item.specialId !== undefined && (

@@ -203,9 +203,10 @@ export const CardsTab: React.FC<CardsTabProps> = ({ campaign }) => {
                         <Text className={`text-base font-bold ${TENSION_TEXT_CLASSES[color]}`}>
                           {color}
                         </Text>
-                        {sortBySpecialId(groupCards, card => resolveCard(cardType, card).specialId).map(
-                          card => renderCardEntry(cardType, card)
-                        )}
+                        {sortBySpecialId(
+                          groupCards,
+                          card => resolveCard(cardType, card).specialId
+                        ).map(card => renderCardEntry(cardType, card))}
                       </VStack>
                     ))}
                   </VStack>
@@ -215,8 +216,8 @@ export const CardsTab: React.FC<CardsTabProps> = ({ campaign }) => {
               return (
                 <VStack key={cardType} space="sm">
                   <Text className="text-foreground text-xl font-bold">{cardType}</Text>
-                  {sortBySpecialId(cards, card => resolveCard(cardType, card).specialId).map(
-                    card => renderCardEntry(cardType, card)
+                  {sortBySpecialId(cards, card => resolveCard(cardType, card).specialId).map(card =>
+                    renderCardEntry(cardType, card)
                   )}
                 </VStack>
               );

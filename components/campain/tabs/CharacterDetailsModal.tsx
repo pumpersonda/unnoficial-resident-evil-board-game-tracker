@@ -32,7 +32,9 @@ export const CharacterDetailsModal: React.FC<CharacterDetailsModalProps> = ({
 
   const isInTheReserve = campaignCharacter.isInTheReserve;
   const showKerosene =
-    !isInTheReserve && campaign.game === GameVersion.RE1 && campaignCharacter.kerosene !== undefined;
+    !isInTheReserve &&
+    campaign.game === GameVersion.RE1 &&
+    campaignCharacter.kerosene !== undefined;
 
   return (
     <FullScreenModal isOpen={isOpen} onClose={onClose} title={campaignCharacter.character.name}>

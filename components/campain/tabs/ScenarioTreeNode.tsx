@@ -25,7 +25,11 @@ export const ScenarioTreeNode: React.FC<ScenarioTreeNodeProps> = ({
   const isLocked = node.status === 'Locked';
   const isCompleted = node.status === 'Completed';
 
-  const statusColor = isCompleted ? colors.success : isLocked ? colors.mutedForeground : colors.warning;
+  const statusColor = isCompleted
+    ? colors.success
+    : isLocked
+      ? colors.mutedForeground
+      : colors.warning;
   const StatusIcon = isCompleted ? Check : isLocked ? Lock : Unlock;
 
   return (
