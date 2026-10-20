@@ -11,7 +11,7 @@ interface SummaryTabProps {
 }
 
 export const SummaryTab: React.FC<SummaryTabProps> = ({ campaign }) => {
-  const activeCharsCount = campaign.activeCharacters.length;
+  const activeCharsCount = campaign.characters.filter(ch => !ch.isInTheReserve).length;
   const itemsInBoxCount = campaign.itemsBox.length;
 
   const countCards = (cardDict: Partial<Record<CardType, CardModel[]>>) =>

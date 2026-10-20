@@ -29,7 +29,7 @@ export const AssignItemModal: React.FC<AssignItemModalProps> = ({
 }) => {
   const [query, setQuery] = useState('');
   const removeFromItemsBox = useCampaignStore(state => state.removeFromItemsBox);
-  const addItemToActiveCharacter = useCampaignStore(state => state.addItemToActiveCharacter);
+  const addItemToCharacter = useCampaignStore(state => state.addItemToCharacter);
   const toast = useToast();
 
   const normalizedQuery = query.trim().toLowerCase();
@@ -49,9 +49,9 @@ export const AssignItemModal: React.FC<AssignItemModalProps> = ({
     const item = campaign.itemsBox.find(i => i.id === itemId);
     if (!item) return;
     removeFromItemsBox(item.id, 1);
-    addItemToActiveCharacter(characterId, { ...item, quantity: 1 });
+    addItemToCharacter(characterId, { ...item, quantity: 1 });
 
-    const characterName = campaign.activeCharacters.find(ac => ac.character.id === characterId)
+    const characterName = campaign.characters.find(ch => ch.character.id === characterId)
       ?.character.name;
 
     toast.show({

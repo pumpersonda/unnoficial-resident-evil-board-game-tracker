@@ -80,13 +80,24 @@ export interface Item extends Card {
   image?: ImageSourcePropType;
 }
 
-export interface ActiveCharacter {
+export interface CampaignCharacter {
   character: CharacterProfile;
   controlledBy: Player;
   health: CharacterHealth;
   inventory: Item[];
   kerosene?: number; // RE1
   isAdvancedVersion: boolean;
+  /**
+   * In the Reserve: no player name, no inventory, no kerosene, can't be poisoned.
+   * Only health.value is tracked.
+   */
+  isInTheReserve: boolean;
+  /**
+   * This entry was created using the character's special Reserve-only card
+   * (only possible when character.hasReserveOnly). Permanently forces
+   * isInTheReserve true and can't be toggled back — but can still be deleted.
+   */
+  isReserveOnly: boolean;
 }
 
 export type CardType =
@@ -117,8 +128,7 @@ export interface Campaign {
   game: GameVersion;
   difficulty: 'Easy' | 'Normal' | 'Hard';
   dangerLevel: number;
-  activeCharacters: ActiveCharacter[];
-  reserveCharacters: CharacterProfile[];
+  characters: CampaignCharacter[];
   itemsBox: Item[];
   addedCards: Partial<Record<CardType, Card[]>>;
   discardedCards: Partial<Record<CardType, Card[]>>;

@@ -24,22 +24,19 @@ export const SelectCharacterModal: React.FC<SelectCharacterModalProps> = ({
   onClose,
   campaign,
 }) => {
-  const addActiveCharacter = useCampaignStore(state => state.addActiveCharacter);
-  const addReserveCharacter = useCampaignStore(state => state.addReserveCharacter);
+  const addCharacter = useCampaignStore(state => state.addCharacter);
 
   const [expandedCharacterId, setExpandedCharacterId] = useState<string | null>(null);
   const [playerName, setPlayerName] = useState('');
   const [isAdvancedChecked, setIsAdvancedChecked] = useState(false);
-  const [isReservedChecked, setIsReservedChecked] = useState(false);
+  const [isReserveOnlyChecked, setIsReserveOnlyChecked] = useState(false);
+  const [isAddToReserveChecked, setIsAddToReserveChecked] = useState(false);
+  const placingInReserve = isReserveOnlyChecked || isAddToReserveChecked;
 
   const allCharacters = useMemo(() => getGameCharacters(campaign.game), [campaign.game]);
   const takenIds = useMemo(
-    () =>
-      new Set([
-        ...campaign.activeCharacters.map(ac => ac.character.id),
-        ...campaign.reserveCharacters.map(c => c.id),
-      ]),
-    [campaign.activeCharacters, campaign.reserveCharacters]
+    () => new Set(campaign.characters.map(ch => ch.character.id)),
+    [campaign.characters]
   );
   const availableCharacters = allCharacters.filter(c => !takenIds.has(c.id));
 
@@ -47,7 +44,8 @@ export const SelectCharacterModal: React.FC<SelectCharacterModalProps> = ({
     setExpandedCharacterId(null);
     setPlayerName('');
     setIsAdvancedChecked(false);
-    setIsReservedChecked(false);
+    setIsReserveOnlyChecked(false);
+    setIsAddToReserveChecked(false);
   };
 
   const handleClose = () => {
@@ -62,26 +60,25 @@ export const SelectCharacterModal: React.FC<SelectCharacterModalProps> = ({
       setExpandedCharacterId(character.id);
       setPlayerName('');
       setIsAdvancedChecked(false);
-      setIsReservedChecked(false);
+      setIsReserveOnlyChecked(false);
+      setIsAddToReserveChecked(false);
     }
   };
 
   const handleConfirm = (character: CharacterProfile) => {
-    if (isReservedChecked) {
-      addReserveCharacter(character);
-    } else {
-      addActiveCharacter({
-        character,
-        controlledBy: {
-          id: Math.random().toString(36).substring(2, 9),
-          realName: playerName.trim(),
-        },
-        health: { value: 5, isPoisoned: false },
-        inventory: [],
-        kerosene: campaign.game === GameVersion.RE1 ? 0 : undefined,
-        isAdvancedVersion: isAdvancedChecked,
-      });
-    }
+    addCharacter({
+      character,
+      controlledBy: {
+        id: Math.random().toString(36).substring(2, 9),
+        realName: placingInReserve ? '' : playerName.trim(),
+      },
+      health: { value: 5, isPoisoned: false },
+      inventory: [],
+      kerosene: !placingInReserve && campaign.game === GameVersion.RE1 ? 0 : undefined,
+      isAdvancedVersion: isAdvancedChecked,
+      isInTheReserve: placingInReserve,
+      isReserveOnly: isReserveOnlyChecked,
+    });
     resetRowState();
   };
 
@@ -123,7 +120,7 @@ export const SelectCharacterModal: React.FC<SelectCharacterModalProps> = ({
 
                   {isExpanded && (
                     <VStack space="md" className="px-3 pb-4">
-                      {!isReservedChecked && (
+                      {!placingInReserve && (
                         <Input className="bg-background">
                           <InputField
                             placeholder="Player name (optional)"
@@ -148,11 +145,24 @@ export const SelectCharacterModal: React.FC<SelectCharacterModalProps> = ({
                         </Checkbox>
                       )}
 
-                      {character.isReserved && (
+                      {character.hasReserveOnly && (
                         <Checkbox
-                          value="reserved"
-                          isChecked={isReservedChecked}
-                          onChange={setIsReservedChecked}
+                          value="reserve-only"
+                          isChecked={isReserveOnlyChecked}
+                          onChange={setIsReserveOnlyChecked}
+                        >
+                          <CheckboxIndicator>
+                            <CheckboxIcon as={Check} />
+                          </CheckboxIndicator>
+                          <CheckboxLabel>Reserve Only</CheckboxLabel>
+                        </Checkbox>
+                      )}
+
+                      {!isReserveOnlyChecked && (
+                        <Checkbox
+                          value="add-to-reserve"
+                          isChecked={isAddToReserveChecked}
+                          onChange={setIsAddToReserveChecked}
                         >
                           <CheckboxIndicator>
                             <CheckboxIcon as={Check} />
@@ -165,9 +175,7 @@ export const SelectCharacterModal: React.FC<SelectCharacterModalProps> = ({
                         className="bg-destructive active:opacity-90"
                         onPress={() => handleConfirm(character)}
                       >
-                        <ButtonText>
-                          {isReservedChecked ? 'Add to Reserve' : 'Add to Roster'}
-                        </ButtonText>
+                        <ButtonText>{placingInReserve ? 'Add to Reserve' : 'Add to Roster'}</ButtonText>
                       </Button>
                     </VStack>
                   )}

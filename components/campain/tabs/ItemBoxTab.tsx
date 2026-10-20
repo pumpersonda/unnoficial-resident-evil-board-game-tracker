@@ -46,11 +46,11 @@ function buildItemBoxEntries(campaign: Campaign): ItemBoxEntry[] {
     entries.set(item.id, { item, boxQuantity: item.quantity, holders: [] });
   }
 
-  for (const activeCharacter of campaign.activeCharacters) {
-    for (const item of activeCharacter.inventory) {
+  for (const campaignCharacter of campaign.characters) {
+    for (const item of campaignCharacter.inventory) {
       const existing = entries.get(item.id);
       const holder: ItemHolder = {
-        characterName: activeCharacter.character.name,
+        characterName: campaignCharacter.character.name,
         quantity: item.quantity,
       };
       if (existing) {

@@ -55,8 +55,7 @@ describe('campaignStore - createCampaign', () => {
     expect(campaign?.id).toEqual(expect.any(String));
     expect(campaign?.id.length).toBeGreaterThan(0);
     expect(campaign?.dangerLevel).toBe(0);
-    expect(campaign?.activeCharacters).toEqual([]);
-    expect(campaign?.reserveCharacters).toEqual([]);
+    expect(campaign?.characters).toEqual([]);
     expect(campaign?.itemsBox).toEqual([]);
     expect(campaign?.enabledExpansions).toEqual(['Core Box']);
     expect(campaign?.discardedCards).toEqual({});
