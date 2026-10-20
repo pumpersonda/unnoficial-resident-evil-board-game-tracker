@@ -161,7 +161,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     name: 'Garden A',
     quantity: 1,
     lockStatus: 'Both sides unlocked',
-    isLocked: false,
+    isLocked: true,
   },
   {
     id: 'core-helipad',
@@ -171,7 +171,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     name: 'Helipad',
     quantity: 1,
     lockStatus: 'Both sides unlocked',
-    isLocked: false,
+    isLocked: true,
   },
   {
     id: 'core-lab-a',
@@ -191,7 +191,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     name: 'Lab B',
     quantity: 1,
     lockStatus: 'Both sides unlocked',
-    isLocked: false,
+    isLocked: true,
   },
   {
     id: 'core-lab-c',
@@ -201,7 +201,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     name: 'Lab C',
     quantity: 1,
     lockStatus: 'Both sides unlocked',
-    isLocked: false,
+    isLocked: true,
   },
 
   // Bleak Outpost
@@ -213,7 +213,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     name: 'Aqua Ring A',
     quantity: 1,
     lockStatus: 'Both sides unlocked',
-    isLocked: false,
+    isLocked: true,
   },
   {
     id: 'bleak-aqua-ring-b',
@@ -223,7 +223,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     name: 'Aqua Ring B',
     quantity: 1,
     lockStatus: 'Both sides unlocked',
-    isLocked: false,
+    isLocked: true,
   },
   {
     id: 'bleak-garden-a',
@@ -233,7 +233,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     name: 'Garden A',
     quantity: 1,
     lockStatus: 'Both sides unlocked',
-    isLocked: false,
+    isLocked: true,
   },
   {
     id: 'bleak-garden-b',
@@ -253,7 +253,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     name: 'Guard House A',
     quantity: 1,
     lockStatus: 'Both sides unlocked',
-    isLocked: false,
+    isLocked: true,
   },
   {
     id: 'bleak-guard-house-b',
@@ -263,7 +263,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     name: 'Guard House B',
     quantity: 1,
     lockStatus: 'Both sides unlocked',
-    isLocked: false,
+    isLocked: true,
   },
   {
     id: 'bleak-guard-house-c',
@@ -273,7 +273,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     name: 'Guard House C',
     quantity: 1,
     lockStatus: 'Both sides unlocked',
-    isLocked: false,
+    isLocked: true,
   },
 
   // Into The Darkness
@@ -305,7 +305,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     name: '2nd Floor East C',
     quantity: 1,
     lockStatus: 'Both sides unlocked',
-    isLocked: false,
+    isLocked: true,
   },
   {
     id: 'darkness-3rd-floor-a',
@@ -325,7 +325,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     name: '3rd Floor B',
     quantity: 1,
     lockStatus: 'Both sides unlocked',
-    isLocked: false,
+    isLocked: true,
   },
   {
     id: 'darkness-caves-a',
@@ -335,7 +335,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     name: 'Caves A',
     quantity: 1,
     lockStatus: 'Both sides unlocked',
-    isLocked: false,
+    isLocked: true,
   },
   {
     id: 'darkness-caves-b',
@@ -345,7 +345,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     name: 'Caves B',
     quantity: 1,
     lockStatus: 'Both sides unlocked',
-    isLocked: false,
+    isLocked: true,
   },
   {
     id: 'darkness-caves-c',
@@ -355,7 +355,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     name: 'Caves C',
     quantity: 1,
     lockStatus: 'Both sides unlocked',
-    isLocked: false,
+    isLocked: true,
   },
   {
     id: 'darkness-crypts-a',
