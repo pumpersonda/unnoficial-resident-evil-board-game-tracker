@@ -1,4 +1,4 @@
-# Resident Evil: The Board Game — Campaign Tracker
+# Unnoficial Campaign Tracker Resident Evil: The Board Game
 
 An unofficial, fan-made companion app to track full campaigns of **Resident Evil: The Board Game**, built with React Native + TypeScript. Designed for players who want a fast, offline way to manage scenario progress, characters, cards, and the shared item box during play — without pausing the game to shuffle through rulebooks or spreadsheets.
 
