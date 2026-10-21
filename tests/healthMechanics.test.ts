@@ -1,6 +1,6 @@
 import { useCampaignStore } from '@/store/campaignStore';
 import { CharacterProfile } from '@/data/RE1/characters';
-import { ActiveCharacter, CharacterHealth, GameVersion, Player } from '@/types';
+import { CampaignCharacter, CharacterHealth, GameVersion, Player } from '@/types';
 
 const getCurrentCampaign = () => {
   const { allCampaigns, currentCampaignId } = useCampaignStore.getState();
@@ -14,7 +14,7 @@ const makeCharacter = (id: string, name: string): CharacterProfile => ({
   game: GameVersion.RE1,
   quantity: 1,
   isAdvanced: false,
-  isReserved: false,
+  hasReserveOnly: false,
   expansion: 'Core Box',
   avatar: { uri: `avatar-${id}` },
 });
@@ -24,16 +24,18 @@ const makePlayer = (id: string, realName: string): Player => ({
   realName,
 });
 
-const makeActiveCharacter = (
+const makeCampaignCharacter = (
   characterId: string,
   name: string,
   health: CharacterHealth = { value: 5, isPoisoned: false }
-): ActiveCharacter => ({
+): CampaignCharacter => ({
   character: makeCharacter(characterId, name),
   controlledBy: makePlayer(`player-${characterId}`, `Player ${name}`),
   health,
   inventory: [],
   isAdvancedVersion: false,
+  isInTheReserve: false,
+  isReserveOnly: false,
 });
 
 const resetStore = () => {
@@ -51,92 +53,88 @@ describe('campaignStore - health mechanics', () => {
   });
 
   it('updates the health of the targeted active character', () => {
-    const { addActiveCharacter, updateActiveCharacterHealth } = useCampaignStore.getState();
+    const { addCharacter, updateCharacterHealth } = useCampaignStore.getState();
 
-    addActiveCharacter(makeActiveCharacter('chris', 'Chris'));
-    updateActiveCharacterHealth('chris', { value: 3, isPoisoned: false });
+    addCharacter(makeCampaignCharacter('chris', 'Chris'));
+    updateCharacterHealth('chris', { value: 3, isPoisoned: false });
 
     const campaign = getCurrentCampaign();
-    const chris = campaign?.activeCharacters.find(ac => ac.character.id === 'chris');
+    const chris = campaign?.characters.find(ch => ch.character.id === 'chris');
 
     expect(chris?.health).toEqual({ value: 3, isPoisoned: false });
   });
 
   it('sets the isPoisoned flag independently from the health value', () => {
-    const { addActiveCharacter, updateActiveCharacterHealth } = useCampaignStore.getState();
+    const { addCharacter, updateCharacterHealth } = useCampaignStore.getState();
 
-    addActiveCharacter(makeActiveCharacter('jill', 'Jill'));
-    updateActiveCharacterHealth('jill', { value: 4, isPoisoned: true });
+    addCharacter(makeCampaignCharacter('jill', 'Jill'));
+    updateCharacterHealth('jill', { value: 4, isPoisoned: true });
 
     const campaign = getCurrentCampaign();
-    const jill = campaign?.activeCharacters.find(ac => ac.character.id === 'jill');
+    const jill = campaign?.characters.find(ch => ch.character.id === 'jill');
 
     expect(jill?.health.isPoisoned).toBe(true);
     expect(jill?.health.value).toBe(4);
   });
 
   it('allows health to reach 0 (dead)', () => {
-    const { addActiveCharacter, updateActiveCharacterHealth } = useCampaignStore.getState();
+    const { addCharacter, updateCharacterHealth } = useCampaignStore.getState();
 
-    addActiveCharacter(makeActiveCharacter('barry', 'Barry'));
-    updateActiveCharacterHealth('barry', { value: 0, isPoisoned: false });
+    addCharacter(makeCampaignCharacter('barry', 'Barry'));
+    updateCharacterHealth('barry', { value: 0, isPoisoned: false });
 
     const campaign = getCurrentCampaign();
-    const barry = campaign?.activeCharacters.find(ac => ac.character.id === 'barry');
+    const barry = campaign?.characters.find(ch => ch.character.id === 'barry');
 
     expect(barry?.health.value).toBe(0);
   });
 
   it('only updates the targeted character, leaving other active characters untouched', () => {
-    const { addActiveCharacter, updateActiveCharacterHealth } = useCampaignStore.getState();
+    const { addCharacter, updateCharacterHealth } = useCampaignStore.getState();
 
-    addActiveCharacter(makeActiveCharacter('chris', 'Chris'));
-    addActiveCharacter(makeActiveCharacter('jill', 'Jill', { value: 5, isPoisoned: false }));
+    addCharacter(makeCampaignCharacter('chris', 'Chris'));
+    addCharacter(makeCampaignCharacter('jill', 'Jill', { value: 5, isPoisoned: false }));
 
-    updateActiveCharacterHealth('chris', { value: 1, isPoisoned: true });
+    updateCharacterHealth('chris', { value: 1, isPoisoned: true });
 
     const campaign = getCurrentCampaign();
-    const chris = campaign?.activeCharacters.find(ac => ac.character.id === 'chris');
-    const jill = campaign?.activeCharacters.find(ac => ac.character.id === 'jill');
+    const chris = campaign?.characters.find(ch => ch.character.id === 'chris');
+    const jill = campaign?.characters.find(ch => ch.character.id === 'jill');
 
     expect(chris?.health).toEqual({ value: 1, isPoisoned: true });
     expect(jill?.health).toEqual({ value: 5, isPoisoned: false });
   });
 
   it('does not affect campaigns other than the current one', () => {
-    const {
-      createCampaign,
-      setCurrentCampaignId,
-      addActiveCharacter,
-      updateActiveCharacterHealth,
-    } = useCampaignStore.getState();
+    const { createCampaign, setCurrentCampaignId, addCharacter, updateCharacterHealth } =
+      useCampaignStore.getState();
 
     const firstCampaignId = useCampaignStore.getState().currentCampaignId!;
-    addActiveCharacter(makeActiveCharacter('chris', 'Chris'));
+    addCharacter(makeCampaignCharacter('chris', 'Chris'));
 
     createCampaign({ name: 'Second Campaign', gameVersion: 'RE2', difficulty: 'Hard' });
-    addActiveCharacter(makeActiveCharacter('chris', 'Chris'));
+    addCharacter(makeCampaignCharacter('chris', 'Chris'));
 
-    updateActiveCharacterHealth('chris', { value: 0, isPoisoned: true });
+    updateCharacterHealth('chris', { value: 0, isPoisoned: true });
 
     const allCampaigns = useCampaignStore.getState().allCampaigns;
     const firstCampaign = allCampaigns.find(c => c.id === firstCampaignId);
     const secondCampaign = allCampaigns.find(c => c.id !== firstCampaignId);
 
-    expect(firstCampaign?.activeCharacters[0].health).toEqual({ value: 5, isPoisoned: false });
-    expect(secondCampaign?.activeCharacters[0].health).toEqual({ value: 0, isPoisoned: true });
+    expect(firstCampaign?.characters[0].health).toEqual({ value: 5, isPoisoned: false });
+    expect(secondCampaign?.characters[0].health).toEqual({ value: 0, isPoisoned: true });
 
     setCurrentCampaignId(firstCampaignId);
   });
 
   it('leaves state unchanged when the characterId does not match any active character', () => {
-    const { addActiveCharacter, updateActiveCharacterHealth } = useCampaignStore.getState();
+    const { addCharacter, updateCharacterHealth } = useCampaignStore.getState();
 
-    addActiveCharacter(makeActiveCharacter('chris', 'Chris'));
-    updateActiveCharacterHealth('unknown-id', { value: 0, isPoisoned: true });
+    addCharacter(makeCampaignCharacter('chris', 'Chris'));
+    updateCharacterHealth('unknown-id', { value: 0, isPoisoned: true });
 
     const campaign = getCurrentCampaign();
-    const chris = campaign?.activeCharacters.find(ac => ac.character.id === 'chris');
+    const chris = campaign?.characters.find(ch => ch.character.id === 'chris');
 
     expect(chris?.health).toEqual({ value: 5, isPoisoned: false });
   });

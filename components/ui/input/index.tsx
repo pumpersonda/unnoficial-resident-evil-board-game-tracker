@@ -82,6 +82,7 @@ const InputField = React.forwardRef<React.ComponentRef<typeof UIInput.Input>, II
     return (
       <UIInput.Input
         ref={ref}
+        placeholderTextColorClassName="accent-muted-foreground"
         {...props}
         className={inputFieldStyle({
           class: className,

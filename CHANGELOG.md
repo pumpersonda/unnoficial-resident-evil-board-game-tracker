@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- Items are now grouped and sorted by category (S, A, B, C) in `AddItemModal`, `AssignItemModal`, and `ItemBoxTab`, with a shared color-coded `ItemCategoryBadge` (gray/blue/red/green) and the card's `specialId` shown when present
+- Optional `image` field on `Item` plus a shared `ItemIcon` component (image with a package-icon fallback) rendered before the item name in `AddItemModal`, `AssignItemModal`, and `ItemBoxTab`
+- Tension cards in `CardsTab` (Added/Discarded) and `SelectCardModal` are now grouped and sorted by color, in the order Green, Amber, Red, via a shared `groupByTensionColor` helper and color-coded group headers (`tensionCardDisplay.ts`)
+- Tension, Encounter, Mission, and Narrative cards now show their `specialId` next to the name in `CardsTab` and `SelectCardModal`, same style as items
+- Cards within every group (each Tension color group, and each flat card-type category) are sorted ascending by `specialId` using a new shared `sortBySpecialId` helper (`utils/cards.ts`)
+- `ScenariosTab` rebuilt as a branching unlock-path tracker driven by the new static RE1 map tree (`data/RE1/scenarioMap.ts`): one collapsible accordion per door off the hidden Main Hall root (`DoorBranch`), each rendering its chain/branches as an indented, color-coded tree (`ScenarioTreeNode`) that resolves expansion alternates and gates each scenario's "Unlock" action on its parent already being unlocked, via a new pure resolver (`data/RE1/scenarioTree.ts`)
+- Reserve characters can now be deleted, and any character (not just the 4 with a special Reserve-only card) can be added to or promoted/demoted from the Reserve via a new "Add to Reserve" / "In Reserve" toggle, available from `SelectCharacterModal`, `CharactersTab`, and `EditCharacterModal`
+
+### Changed
+
+- Added horizontal swipe/slide navigation between campaign tabs (Summary, Characters, Item Box, Cards, Scenarios) in `CurrentCampaignScreen`, backed by a paginated `ScrollView` synced with `CampaignTabBar`, with each tab's content lazily mounted on first visit
+- Switched the campaign tab pager's `ScrollView` and the new `DoorBranch` tree's horizontal `ScrollView` to `react-native-gesture-handler`'s `ScrollView`, so the deep-branch horizontal scroll no longer gets swallowed by the outer paging swipe gesture
+- Redesigned all content modals (`CreateCampaignModal`, `SelectCharacterModal`, `AssignItemModal`, `SelectCardCategoryModal`, `AddItemModal`, `CharacterDetailsModal`, `SelectCardModal`, `EditCharacterModal`, `DangerLevelModal`) from partial centered dialogs into full-screen screens, sharing a new `components/shared/FullScreenModal.tsx` scaffold (centered header title, close button, slide-up/down animation, safe-area-aware header/footer, consistent default "Close" footer action)
+- Merged `Campaign.activeCharacters`/`reserveCharacters` into a single `Campaign.characters: CampaignCharacter[]` list with an `isInTheReserve` flag, so a character's health/inventory/kerosene are preserved when it's benched instead of being lost; while in the Reserve, a character has no player name, inventory, kerosene, or poison status, only health. Renamed `CharacterProfile.isReserved` to the purely informational `hasReserveOnly` (does this character have an optional Reserve-only card at all), and added a separate per-entry `CampaignCharacter.isReserveOnly` that's only set when that card is actually used — which permanently locks the entry in the Reserve (deletable, but no longer editable)
+
+### Fixed
+
+- Fixed unreadable (dark/default-colored) placeholder text on `Input` and `Select` fields in dark theme by passing `placeholderTextColorClassName` with the Uniwind `accent-*` color prefix, since the native `TextInput`'s placeholder color isn't themeable through the web-only `placeholder:` Tailwind variant alone (`components/ui/input/index.tsx`, `components/ui/select/index.tsx`)
+
 ## [0.2.1-alpha] - 2026-09-29
 
 ### Security

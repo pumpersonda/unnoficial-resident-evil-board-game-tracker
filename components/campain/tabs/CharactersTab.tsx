@@ -1,16 +1,3 @@
-import React, { useState } from 'react';
-import { Image, ScrollView, View } from 'react-native';
-import { VStack } from '@/components/ui/vstack';
-import { HStack } from '@/components/ui/hstack';
-import { Text } from '@/components/ui/text';
-import { Card } from '@/components/ui/card';
-import { Pressable } from '@/components/ui/pressable';
-import { ActiveCharacter, Campaign, getHealthColor, HEALTH_LABELS, KEROSENE_COLOR } from '@/types';
-import { useCampaignStore } from '@/store/campaignStore';
-import { Droplet, Pencil, Plus, Trash2 } from 'lucide-react-native';
-import { SelectCharacterModal } from './SelectCharacterModal';
-import { EditCharacterModal } from './EditCharacterModal';
-import { CharacterDetailsModal } from './CharacterDetailsModal';
 import {
   AlertDialog,
   AlertDialogBackdrop,
@@ -20,7 +7,27 @@ import {
   AlertDialogHeader,
 } from '@/components/ui/alert-dialog';
 import { Button, ButtonText } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Checkbox, CheckboxIcon, CheckboxIndicator, CheckboxLabel } from '@/components/ui/checkbox';
+import { HStack } from '@/components/ui/hstack';
+import { Pressable } from '@/components/ui/pressable';
+import { Text } from '@/components/ui/text';
 import { Toast, ToastDescription, ToastTitle, useToast } from '@/components/ui/toast';
+import { VStack } from '@/components/ui/vstack';
+import { useCampaignStore } from '@/store/campaignStore';
+import {
+  Campaign,
+  CampaignCharacter,
+  getHealthColor,
+  HEALTH_LABELS,
+  KEROSENE_COLOR,
+} from '@/types';
+import { Check, Droplet, Pencil, Plus, Trash2 } from 'lucide-react-native';
+import React, { useState } from 'react';
+import { Image, ScrollView, View } from 'react-native';
+import { CharacterDetailsModal } from './CharacterDetailsModal';
+import { EditCharacterModal } from './EditCharacterModal';
+import { SelectCharacterModal } from './SelectCharacterModal';
 
 interface CharactersTabProps {
   campaign: Campaign;
@@ -34,13 +41,14 @@ export const CharactersTab: React.FC<CharactersTabProps> = ({ campaign }) => {
     id: string;
     name: string;
   } | null>(null);
-  const removeActiveCharacter = useCampaignStore(state => state.removeActiveCharacter);
+  const removeCharacter = useCampaignStore(state => state.removeCharacter);
+  const setCharacterReserved = useCampaignStore(state => state.setCharacterReserved);
   const toast = useToast();
 
-  const editingCharacter: ActiveCharacter | null =
-    campaign.activeCharacters.find(ac => ac.character.id === editingCharacterId) ?? null;
-  const viewingCharacter: ActiveCharacter | null =
-    campaign.activeCharacters.find(ac => ac.character.id === viewingCharacterId) ?? null;
+  const editingCharacter: CampaignCharacter | null =
+    campaign.characters.find(ch => ch.character.id === editingCharacterId) ?? null;
+  const viewingCharacter: CampaignCharacter | null =
+    campaign.characters.find(ch => ch.character.id === viewingCharacterId) ?? null;
 
   const handleRequestRemoveCharacter = (id: string, name: string) => {
     setCharacterPendingRemoval({ id, name });
@@ -49,7 +57,7 @@ export const CharactersTab: React.FC<CharactersTabProps> = ({ campaign }) => {
   const handleConfirmRemoveCharacter = () => {
     if (!characterPendingRemoval) return;
     const { id, name } = characterPendingRemoval;
-    removeActiveCharacter(id);
+    removeCharacter(id);
     setCharacterPendingRemoval(null);
     toast.show({
       placement: 'top',
@@ -62,118 +70,113 @@ export const CharactersTab: React.FC<CharactersTabProps> = ({ campaign }) => {
     });
   };
 
-  const hasActiveCharacters = campaign.activeCharacters.length > 0;
-  const hasReserveCharacters = campaign.reserveCharacters.length > 0;
+  const activeRoster = campaign.characters.filter(ch => !ch.isInTheReserve);
+  const reserveRoster = campaign.characters.filter(ch => ch.isInTheReserve);
+
+  const renderCharacterCard = (campaignCharacter: CampaignCharacter) => {
+    const { character, isInTheReserve } = campaignCharacter;
+    const itemCount = campaignCharacter.inventory.reduce((total, item) => total + item.quantity, 0);
+
+    return (
+      <Pressable
+        key={character.id}
+        onPress={() => setViewingCharacterId(character.id)}
+        accessibilityLabel={`View ${character.name} details`}
+      >
+        <Card className="bg-card border border-border p-4 rounded-2xl">
+          <HStack space="md" className="items-center">
+            <Image source={character.avatar} className="w-12 h-12 rounded-full bg-muted" />
+            <VStack className="flex-1">
+              <HStack space="sm" className="items-center">
+                <Text className="text-foreground font-semibold">{character.name}</Text>
+                {campaignCharacter.isAdvancedVersion && (
+                  <Text className="text-destructive text-xs font-semibold px-2 py-0.5 border border-destructive rounded-full">
+                    Advanced
+                  </Text>
+                )}
+              </HStack>
+              {!isInTheReserve && (
+                <Text className="text-muted-foreground text-sm">
+                  {campaignCharacter.controlledBy.realName || character.name}
+                </Text>
+              )}
+              <HStack space="xs" className="items-center">
+                <View
+                  className="w-2.5 h-2.5 rounded-full"
+                  style={{ backgroundColor: getHealthColor(campaignCharacter.health) }}
+                />
+                <Text className="text-muted-foreground text-xs">
+                  {HEALTH_LABELS[campaignCharacter.health.value]}
+                </Text>
+                {campaignCharacter.kerosene !== undefined && (
+                  <HStack space="xs" className="items-center ml-2">
+                    <Droplet color={KEROSENE_COLOR} size={12} />
+                    <Text className="text-muted-foreground text-xs">
+                      {campaignCharacter.kerosene}
+                    </Text>
+                  </HStack>
+                )}
+              </HStack>
+              {!isInTheReserve && (
+                <Text className="text-muted-foreground text-xs">
+                  {itemCount === 0 ? 'No items' : `${itemCount} items carried`}
+                </Text>
+              )}
+            </VStack>
+            <Pressable
+              onPress={() => setEditingCharacterId(character.id)}
+              className="px-3 mt-12 rounded-full active:bg-muted"
+              accessibilityLabel="Edit character"
+            >
+              <Pencil color="gray" size={20} />
+            </Pressable>
+            <Pressable
+              onPress={() => handleRequestRemoveCharacter(character.id, character.name)}
+              className="px-3 mt-12 rounded-full active:bg-destructive/10"
+              accessibilityLabel="Remove character"
+            >
+              <Trash2 color="gray" size={20} />
+            </Pressable>
+          </HStack>
+
+          <HStack className="items-center justify-end pt-3 mt-3 border-t border-border">
+            <Checkbox
+              value="in-the-reserve"
+              isChecked={isInTheReserve}
+              isDisabled={campaignCharacter.isReserveOnly}
+              onChange={checked => setCharacterReserved(character.id, checked)}
+            >
+              <CheckboxIndicator>
+                <CheckboxIcon as={Check} />
+              </CheckboxIndicator>
+              <CheckboxLabel>In Reserve</CheckboxLabel>
+            </Checkbox>
+          </HStack>
+        </Card>
+      </Pressable>
+    );
+  };
 
   return (
     <VStack className="flex-1">
       <ScrollView className="flex-1 p-4" showsVerticalScrollIndicator={false}>
-        {!hasActiveCharacters && !hasReserveCharacters ? (
+        {campaign.characters.length === 0 ? (
           <VStack className="flex-1 items-center justify-center py-12">
             <Text className="text-muted-foreground">No characters selected yet.</Text>
           </VStack>
         ) : (
           <VStack space="lg" className="pb-24">
-            {hasActiveCharacters && (
+            {activeRoster.length > 0 && (
               <VStack space="sm">
                 <Text className="text-foreground text-xl font-bold">Active Roster</Text>
-
-                {campaign.activeCharacters.map(activeCharacter => {
-                  const itemCount = activeCharacter.inventory.reduce(
-                    (total, item) => total + item.quantity,
-                    0
-                  );
-
-                  return (
-                    <Pressable
-                      key={activeCharacter.character.id}
-                      onPress={() => setViewingCharacterId(activeCharacter.character.id)}
-                      accessibilityLabel={`View ${activeCharacter.character.name} details`}
-                    >
-                      <Card className="bg-card border border-border p-4 rounded-2xl">
-                        <HStack space="md" className="items-center">
-                          <Image
-                            source={activeCharacter.character.avatar}
-                            className="w-12 h-12 rounded-full bg-muted"
-                          />
-                          <VStack className="flex-1">
-                            <HStack space="sm" className="items-center">
-                              <Text className="text-foreground font-semibold">
-                                {activeCharacter.character.name}
-                              </Text>
-                              {activeCharacter.isAdvancedVersion && (
-                                <Text className="text-destructive text-xs font-semibold px-2 py-0.5 border border-destructive rounded-full">
-                                  Advanced
-                                </Text>
-                              )}
-                            </HStack>
-                            <Text className="text-muted-foreground text-sm">
-                              {activeCharacter.controlledBy.realName ||
-                                activeCharacter.character.name}
-                            </Text>
-                            <HStack space="xs" className="items-center">
-                              <View
-                                className="w-2.5 h-2.5 rounded-full"
-                                style={{ backgroundColor: getHealthColor(activeCharacter.health) }}
-                              />
-                              <Text className="text-muted-foreground text-xs">
-                                {HEALTH_LABELS[activeCharacter.health.value]}
-                              </Text>
-                              {activeCharacter.kerosene !== undefined && (
-                                <HStack space="xs" className="items-center ml-2">
-                                  <Droplet color={KEROSENE_COLOR} size={12} />
-                                  <Text className="text-muted-foreground text-xs">
-                                    {activeCharacter.kerosene}
-                                  </Text>
-                                </HStack>
-                              )}
-                            </HStack>
-                            <Text className="text-muted-foreground text-xs">
-                              {itemCount === 0 ? 'No items' : `${itemCount} items carried`}
-                            </Text>
-                          </VStack>
-                          <Pressable
-                            onPress={() => setEditingCharacterId(activeCharacter.character.id)}
-                            className="px-3 rounded-full active:bg-muted"
-                            accessibilityLabel="Edit character"
-                          >
-                            <Pencil color="gray" size={20} />
-                          </Pressable>
-                          <Pressable
-                            onPress={() =>
-                              handleRequestRemoveCharacter(
-                                activeCharacter.character.id,
-                                activeCharacter.character.name
-                              )
-                            }
-                            className="px-3 rounded-full active:bg-destructive/10"
-                            accessibilityLabel="Remove character"
-                          >
-                            <Trash2 color="gray" size={20} />
-                          </Pressable>
-                        </HStack>
-                      </Card>
-                    </Pressable>
-                  );
-                })}
+                {activeRoster.map(renderCharacterCard)}
               </VStack>
             )}
 
-            {hasReserveCharacters && (
+            {reserveRoster.length > 0 && (
               <VStack space="sm">
                 <Text className="text-foreground text-xl font-bold">Reserve</Text>
-
-                {campaign.reserveCharacters.map(character => (
-                  <Card key={character.id} className="bg-card border border-border p-4 rounded-2xl">
-                    <HStack space="md" className="items-center">
-                      <Image
-                        source={character.avatar}
-                        className="w-12 h-12 rounded-full bg-muted"
-                      />
-                      <Text className="text-foreground font-semibold">{character.name}</Text>
-                    </HStack>
-                  </Card>
-                ))}
+                {reserveRoster.map(renderCharacterCard)}
               </VStack>
             )}
           </VStack>
@@ -197,14 +200,14 @@ export const CharactersTab: React.FC<CharactersTabProps> = ({ campaign }) => {
         isOpen={editingCharacter !== null}
         onClose={() => setEditingCharacterId(null)}
         campaign={campaign}
-        activeCharacter={editingCharacter}
+        campaignCharacter={editingCharacter}
       />
 
       <CharacterDetailsModal
         isOpen={viewingCharacter !== null}
         onClose={() => setViewingCharacterId(null)}
         campaign={campaign}
-        activeCharacter={viewingCharacter}
+        campaignCharacter={viewingCharacter}
       />
 
       <AlertDialog

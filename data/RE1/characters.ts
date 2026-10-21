@@ -1,6 +1,6 @@
 // Auto-generated from ResEvil1BG_Card_Checklist_v1.0.xlsx
 // Card Type === "Character Profile"
-// Grouped by character. isAdvanced / isReserved indicate available versions.
+// Grouped by character. isAdvanced / hasReserveOnly indicate available versions.
 // game always GameVersion.RE1
 
 import { Card, GameVersion } from '@/types';
@@ -8,7 +8,7 @@ import { ImageSourcePropType } from 'react-native';
 
 export interface CharacterProfile extends Card {
   isAdvanced: boolean;
-  isReserved: boolean;
+  hasReserveOnly: boolean;
   avatar: ImageSourcePropType;
 }
 
@@ -18,7 +18,7 @@ export const CHARACTERS_PROFILE: CharacterProfile[] = [
     name: 'Albert Wesker',
     type: 'CharacterProfile',
     isAdvanced: true,
-    isReserved: true,
+    hasReserveOnly: true,
     game: GameVersion.RE1,
     quantity: 1,
     expansion: 'Core Box',
@@ -29,7 +29,7 @@ export const CHARACTERS_PROFILE: CharacterProfile[] = [
     name: 'Barry Burton',
     type: 'CharacterProfile',
     isAdvanced: true,
-    isReserved: false,
+    hasReserveOnly: false,
     game: GameVersion.RE1,
     quantity: 1,
     expansion: 'Core Box',
@@ -40,7 +40,7 @@ export const CHARACTERS_PROFILE: CharacterProfile[] = [
     name: 'Brad Vickers',
     type: 'CharacterProfile',
     isAdvanced: true,
-    isReserved: true,
+    hasReserveOnly: true,
     game: GameVersion.RE1,
     quantity: 1,
     expansion: 'Core Box',
@@ -51,7 +51,7 @@ export const CHARACTERS_PROFILE: CharacterProfile[] = [
     name: 'Chris Redfield',
     type: 'CharacterProfile',
     isAdvanced: true,
-    isReserved: false,
+    hasReserveOnly: false,
     game: GameVersion.RE1,
     quantity: 1,
     expansion: 'Core Box',
@@ -62,7 +62,7 @@ export const CHARACTERS_PROFILE: CharacterProfile[] = [
     name: 'Edward Dewey',
     type: 'CharacterProfile',
     isAdvanced: true,
-    isReserved: false,
+    hasReserveOnly: false,
     game: GameVersion.RE1,
     quantity: 1,
     expansion: 'Core Box',
@@ -73,7 +73,7 @@ export const CHARACTERS_PROFILE: CharacterProfile[] = [
     name: 'Enrico Marini',
     type: 'CharacterProfile',
     isAdvanced: true,
-    isReserved: true,
+    hasReserveOnly: true,
     game: GameVersion.RE1,
     quantity: 1,
     expansion: 'Core Box',
@@ -84,7 +84,7 @@ export const CHARACTERS_PROFILE: CharacterProfile[] = [
     name: 'Forest Speyer',
     type: 'CharacterProfile',
     isAdvanced: true,
-    isReserved: false,
+    hasReserveOnly: false,
     game: GameVersion.RE1,
     quantity: 1,
     expansion: 'Core Box',
@@ -95,7 +95,7 @@ export const CHARACTERS_PROFILE: CharacterProfile[] = [
     name: 'Jill Valentine',
     type: 'CharacterProfile',
     isAdvanced: true,
-    isReserved: false,
+    hasReserveOnly: false,
     game: GameVersion.RE1,
     quantity: 1,
     expansion: 'Core Box',
@@ -106,7 +106,7 @@ export const CHARACTERS_PROFILE: CharacterProfile[] = [
     name: 'Joseph Frost',
     type: 'CharacterProfile',
     isAdvanced: true,
-    isReserved: false,
+    hasReserveOnly: false,
     game: GameVersion.RE1,
     quantity: 1,
     expansion: 'Core Box',
@@ -117,7 +117,7 @@ export const CHARACTERS_PROFILE: CharacterProfile[] = [
     name: 'Kenneth J. Sullivan',
     type: 'CharacterProfile',
     isAdvanced: true,
-    isReserved: false,
+    hasReserveOnly: false,
     game: GameVersion.RE1,
     quantity: 1,
     expansion: 'Core Box',
@@ -128,7 +128,7 @@ export const CHARACTERS_PROFILE: CharacterProfile[] = [
     name: 'Rebecca Chambers',
     type: 'CharacterProfile',
     isAdvanced: true,
-    isReserved: false,
+    hasReserveOnly: false,
     game: GameVersion.RE1,
     quantity: 1,
     expansion: 'Core Box',
@@ -139,7 +139,7 @@ export const CHARACTERS_PROFILE: CharacterProfile[] = [
     name: 'Richard Aiken',
     type: 'CharacterProfile',
     isAdvanced: true,
-    isReserved: true,
+    hasReserveOnly: true,
     game: GameVersion.RE1,
     quantity: 1,
     expansion: 'Core Box',

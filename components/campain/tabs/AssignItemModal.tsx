@@ -1,14 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import {
-  Modal,
-  ModalBackdrop,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-} from '@/components/ui/modal';
+import { FullScreenModal } from '@/components/shared/FullScreenModal';
+import { ItemCategoryBadge } from '@/components/shared/ItemCategoryBadge';
+import { ItemIcon } from '@/components/shared/ItemIcon';
 import { Button, ButtonText } from '@/components/ui/button';
+import { HStack } from '@/components/ui/hstack';
 import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
@@ -16,9 +11,8 @@ import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
 import { Search, X } from 'lucide-react-native';
 import { Campaign } from '@/types';
 import { useCampaignStore } from '@/store/campaignStore';
-import { useResolvedTheme } from '@/hooks/useResolvedTheme';
-import { THEME_COLORS } from '@/constants/theme';
 import { Toast, ToastDescription, ToastTitle, useToast } from '@/components/ui/toast';
+import { groupItemsByCategory } from '@/utils/items';
 
 interface AssignItemModalProps {
   isOpen: boolean;
@@ -33,10 +27,9 @@ export const AssignItemModal: React.FC<AssignItemModalProps> = ({
   campaign,
   characterId,
 }) => {
-  const resolvedTheme = useResolvedTheme();
   const [query, setQuery] = useState('');
   const removeFromItemsBox = useCampaignStore(state => state.removeFromItemsBox);
-  const addItemToActiveCharacter = useCampaignStore(state => state.addItemToActiveCharacter);
+  const addItemToCharacter = useCampaignStore(state => state.addItemToCharacter);
   const toast = useToast();
 
   const normalizedQuery = query.trim().toLowerCase();
@@ -44,6 +37,8 @@ export const AssignItemModal: React.FC<AssignItemModalProps> = ({
     if (!normalizedQuery) return campaign.itemsBox;
     return campaign.itemsBox.filter(item => item.name.toLowerCase().includes(normalizedQuery));
   }, [campaign.itemsBox, normalizedQuery]);
+
+  const groupedItems = useMemo(() => groupItemsByCategory(visibleItems), [visibleItems]);
 
   const handleClose = () => {
     setQuery('');
@@ -54,10 +49,10 @@ export const AssignItemModal: React.FC<AssignItemModalProps> = ({
     const item = campaign.itemsBox.find(i => i.id === itemId);
     if (!item) return;
     removeFromItemsBox(item.id, 1);
-    addItemToActiveCharacter(characterId, { ...item, quantity: 1 });
+    addItemToCharacter(characterId, { ...item, quantity: 1 });
 
-    const characterName = campaign.activeCharacters.find(ac => ac.character.id === characterId)
-      ?.character.name;
+    const characterName = campaign.characters.find(ch => ch.character.id === characterId)?.character
+      .name;
 
     toast.show({
       placement: 'top',
@@ -75,17 +70,17 @@ export const AssignItemModal: React.FC<AssignItemModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} size="md">
-      <ModalBackdrop />
-      <ModalContent className="bg-card h-[85%] flex-col">
-        <ModalHeader className="pb-3">
-          <Text className="text-foreground text-xl font-semibold">Assign Item</Text>
-          <ModalCloseButton>
-            <X color={THEME_COLORS[resolvedTheme].mutedForeground} size={20} />
-          </ModalCloseButton>
-        </ModalHeader>
-
-        <Input className="bg-background mb-3">
+    <FullScreenModal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Assign Item"
+      footer={
+        <Button className="flex-1 bg-secondary active:opacity-90" onPress={handleClose}>
+          <ButtonText className="text-secondary-foreground">Done</ButtonText>
+        </Button>
+      }
+      stickyTop={
+        <Input className="bg-background">
           <InputSlot className="pl-3">
             <InputIcon as={Search} />
           </InputSlot>
@@ -103,46 +98,58 @@ export const AssignItemModal: React.FC<AssignItemModalProps> = ({
             </InputSlot>
           )}
         </Input>
-
-        <ModalBody className="flex-1 mt-0 mb-0" scrollEnabled showsVerticalScrollIndicator={false}>
-          <VStack space="lg" className="pb-4">
-            {visibleItems.length === 0 ? (
-              <VStack className="items-center justify-center py-16">
-                <Text className="text-muted-foreground text-center">
-                  {normalizedQuery ? `No items match "${query.trim()}".` : 'The item box is empty.'}
-                </Text>
-              </VStack>
-            ) : (
-              <VStack className="bg-background border border-border rounded-xl overflow-hidden">
-                {visibleItems.map((item, index) => {
-                  const isLast = index === visibleItems.length - 1;
-
-                  return (
-                    <Pressable
-                      key={item.id}
-                      onPress={() => handleAssign(item.id)}
-                      className={`flex-row items-center justify-between gap-3 px-3 py-3 active:bg-muted/40 ${
-                        isLast ? '' : 'border-b border-b-border'
-                      }`}
-                    >
-                      <Text className="text-foreground font-medium flex-1" numberOfLines={1}>
-                        {item.name}
-                      </Text>
-                      <Text className="text-muted-foreground text-xs">x{item.quantity}</Text>
-                    </Pressable>
-                  );
-                })}
-              </VStack>
-            )}
+      }
+    >
+      <VStack space="lg" className="pb-4">
+        {visibleItems.length === 0 ? (
+          <VStack className="items-center justify-center py-16">
+            <Text className="text-muted-foreground text-center">
+              {normalizedQuery ? `No items match "${query.trim()}".` : 'The item box is empty.'}
+            </Text>
           </VStack>
-        </ModalBody>
+        ) : (
+          <VStack space="lg">
+            {groupedItems.map(([category, group]) => (
+              <VStack key={category} space="sm">
+                <Text className="text-foreground text-lg font-bold">Category {category}</Text>
+                <VStack className="bg-background border border-border rounded-xl overflow-hidden">
+                  {group.map((item, index) => {
+                    const isLast = index === group.length - 1;
 
-        <ModalFooter className="pt-3">
-          <Button className="flex-1 bg-secondary active:opacity-90" onPress={handleClose}>
-            <ButtonText className="text-secondary-foreground">Done</ButtonText>
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+                    return (
+                      <Pressable
+                        key={item.id}
+                        onPress={() => handleAssign(item.id)}
+                        className={`flex-row items-center justify-between gap-3 px-3 py-3 active:bg-muted/40 ${
+                          isLast ? '' : 'border-b border-b-border'
+                        }`}
+                      >
+                        <HStack className="items-center gap-3 flex-1">
+                          <ItemIcon item={item} />
+                          <HStack className="items-center gap-2 flex-1">
+                            <Text className="text-foreground font-medium flex-1" numberOfLines={1}>
+                              {item.name}
+                            </Text>
+                            {item.specialId !== undefined && (
+                              <Text className="text-muted-foreground text-xs">
+                                #{item.specialId}
+                              </Text>
+                            )}
+                          </HStack>
+                        </HStack>
+                        <HStack className="items-center gap-2">
+                          <Text className="text-muted-foreground text-xs">x{item.quantity}</Text>
+                          <ItemCategoryBadge category={category} />
+                        </HStack>
+                      </Pressable>
+                    );
+                  })}
+                </VStack>
+              </VStack>
+            ))}
+          </VStack>
+        )}
+      </VStack>
+    </FullScreenModal>
   );
 };

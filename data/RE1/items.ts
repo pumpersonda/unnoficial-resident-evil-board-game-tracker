@@ -13,6 +13,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Defensive,
     category: 'A',
     specialId: 6,
+    image: require('@/assets/items/dagger.png'),
   },
   {
     id: '2',
@@ -23,6 +24,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Defensive,
     category: 'A',
+    image: require('@/assets/items/dagger.png'),
   },
   {
     id: '3',
@@ -33,6 +35,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'A',
+    image: require('@/assets/items/first-aid-spray.png'),
   },
   {
     id: '4',
@@ -43,6 +46,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'A',
+    image: require('@/assets/items/green-herb.png'),
   },
   {
     id: '5',
@@ -54,6 +58,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Ammunition,
     category: 'A',
     specialId: 3,
+    image: require('@/assets/items/grenade-rounds.png'),
   },
   {
     id: '6',
@@ -64,6 +69,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Ammunition,
     category: 'A',
+    image: require('@/assets/items/handgun-bullets.png'),
   },
   {
     id: '7',
@@ -75,6 +81,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Item,
     category: 'A',
     specialId: 1,
+    image: require('@/assets/items/kerosene-container.png'),
   },
   {
     id: '8',
@@ -86,6 +93,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Ammunition,
     category: 'A',
     specialId: 4,
+    image: require('@/assets/items/magnum-bullets.png'),
   },
   {
     id: '9',
@@ -97,6 +105,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Item,
     category: 'A',
     specialId: 7,
+    image: require('@/assets/items/mo-disk.png'),
   },
   {
     id: '10',
@@ -107,6 +116,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'A',
+    image: require('@/assets/items/red-herb.png'),
   },
   {
     id: '11',
@@ -118,6 +128,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Ammunition,
     category: 'A',
     specialId: 2,
+    image: require('@/assets/items/shotgun-shells.png'),
   },
   {
     id: '12',
@@ -129,6 +140,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Defensive,
     category: 'A',
     specialId: 5,
+    image: require('@/assets/items/stun-gun.png'),
   },
   {
     id: '13',
@@ -140,6 +152,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Weapon,
     category: 'B',
     ammunition: 6,
+    image: require('@/assets/items/assault-shotgun.png'),
   },
   {
     id: '14',
@@ -150,6 +163,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Weapon,
     category: 'B',
+    image: require('@/assets/items/broken-shotgun.png'),
   },
   {
     id: '15',
@@ -160,6 +174,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Defensive,
     category: 'B',
+    image: require('@/assets/items/dagger.png'),
   },
   {
     id: '16',
@@ -170,6 +185,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Key,
     category: 'B',
+    image: require('@/assets/items/emblem-key.png'),
   },
   {
     id: '17',
@@ -180,6 +196,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/first-aid-spray.png'),
   },
   {
     id: '18',
@@ -191,6 +208,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Weapon,
     category: 'B',
     ammunition: 6,
+    image: require('@/assets/items/flame-thrower.png'),
   },
   {
     id: '19',
@@ -212,6 +230,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Item,
     category: 'B',
     specialId: 3,
+    image: require('@/assets/items/golden-emblem.png'),
   },
   {
     id: '21',
@@ -222,6 +241,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/green-herb.png'),
   },
   {
     id: '22',
@@ -232,6 +252,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Defensive,
     category: 'B',
+    image: require('@/assets/items/grenade.png'),
   },
   {
     id: '23',
@@ -243,6 +264,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Weapon,
     category: 'B',
     ammunition: 6,
+    image: require('@/assets/items/grenade-launcher.png'),
   },
   {
     id: '24',
@@ -253,6 +275,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Ammunition,
     category: 'B',
+    image: require('@/assets/items/grenade-rounds.png'),
   },
   {
     id: '25',
@@ -263,6 +286,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Key,
     category: 'B',
+    image: require('@/assets/items/helmet-key.png'),
   },
   {
     id: '26',
@@ -274,6 +298,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Key,
     category: 'B',
     specialId: 2,
+    image: require('@/assets/items/imitation-key.png'),
   },
   {
     id: '27',
@@ -284,6 +309,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/kerosene-container.png'),
   },
   {
     id: '28',
@@ -294,6 +320,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/lighter.png'),
   },
   {
     id: '29',
@@ -306,6 +333,7 @@ export const ITEMS: Item[] = [
     category: 'B',
     ammunition: 6,
     specialId: 4,
+    image: require('@/assets/items/magnum.png'),
   },
   {
     id: '30',
@@ -316,6 +344,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Ammunition,
     category: 'B',
+    image: require('@/assets/items/magnum-bullets.png'),
   },
   {
     id: '31',
@@ -326,16 +355,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'B',
-  },
-  {
-    id: '32',
-    name: 'Old Key',
-    type: 'Item',
-    game: GameVersion.RE1,
-    quantity: 3,
-    expansion: 'Core Box',
-    itemType: ItemType.Key,
-    category: 'B',
+    image: require('@/assets/items/symbol-file.png'),
   },
   {
     id: '33',
@@ -346,6 +366,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Key,
     category: 'B',
+    image: require('@/assets/items/power-key.png'),
   },
   {
     id: '34',
@@ -358,6 +379,7 @@ export const ITEMS: Item[] = [
     category: 'B',
     ammunition: 6,
     specialId: 5,
+    image: require('@/assets/items/rocket-launcher.png'),
   },
   {
     id: '35',
@@ -370,6 +392,7 @@ export const ITEMS: Item[] = [
     category: 'B',
     ammunition: 6,
     specialId: 1,
+    image: require('@/assets/items/shotgun.png'),
   },
   {
     id: '36',
@@ -380,6 +403,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Ammunition,
     category: 'B',
+    image: require('@/assets/items/shotgun-shells.png'),
   },
   {
     id: '37',
@@ -390,6 +414,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/solution.png'),
   },
   {
     id: '38',
@@ -400,6 +425,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/symbol-file.png'),
   },
   {
     id: '39',
@@ -410,6 +436,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Defensive,
     category: 'B',
+    image: require('@/assets/items/stun-gun.png'),
   },
   {
     id: '40',
@@ -420,6 +447,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/symbol-file.png'),
   },
   {
     id: '41',
@@ -430,6 +458,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/wind-crest.png'),
   },
   {
     id: '42',
@@ -440,6 +469,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/wooden-emblem.png'),
   },
   {
     id: '43',
@@ -450,6 +480,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Key,
     category: 'C',
+    image: require('@/assets/items/armour-key.png'),
   },
   {
     id: '44',
@@ -460,6 +491,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'C',
+    image: require('@/assets/items/death-mask-1.png'),
   },
   {
     id: '45',
@@ -470,6 +502,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'C',
+    image: require('@/assets/items/death-mask-2.png'),
   },
   {
     id: '46',
@@ -480,6 +513,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'C',
+    image: require('@/assets/items/death-mask-3.png'),
   },
   {
     id: '47',
@@ -490,6 +524,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'C',
+    image: require('@/assets/items/dog-whistle.png'),
   },
   {
     id: '48',
@@ -500,6 +535,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'C',
+    image: require('@/assets/items/eagle-medallion.png'),
   },
   {
     id: '49',
@@ -510,6 +546,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'C',
+    image: require('@/assets/items/herbicide.png'),
   },
   {
     id: '50',
@@ -520,6 +557,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'C',
+    image: require('@/assets/items/music-notes.png'),
   },
   {
     id: '51',
@@ -530,6 +568,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Key,
     category: 'C',
+    image: require('@/assets/items/shield-key.png'),
   },
   {
     id: '52',
@@ -540,6 +579,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'C',
+    image: require('@/assets/items/stone-and-metal-object.png'),
   },
   {
     id: '53',
@@ -550,6 +590,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Key,
     category: 'C',
+    image: require('@/assets/items/sword-key.png'),
   },
   {
     id: '54',
@@ -560,6 +601,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'C',
+    image: require('@/assets/items/wolf-medallion.png'),
   },
   {
     id: '55',
@@ -570,6 +612,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'S',
+    image: require('@/assets/items/first-aid-spray.png'),
   },
   {
     id: '56',
@@ -580,6 +623,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Ammunition,
     category: 'S',
+    image: require('@/assets/items/handgun-bullets.png'),
   },
   {
     id: '57',
@@ -591,6 +635,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Weapon,
     category: 'S',
     ammunition: 15,
+    image: require('@/assets/items/handgun.png'),
   },
   {
     id: '58',
@@ -601,6 +646,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Weapon,
     category: 'S',
+    image: require('@/assets/items/knife.png'),
   },
   {
     id: '59',
@@ -611,6 +657,7 @@ export const ITEMS: Item[] = [
     expansion: 'Core Box',
     itemType: ItemType.Item,
     category: 'S',
+    image: require('@/assets/items/lighter.png'),
   },
 
   // ==================== BLEAK OUTPOST ====================
@@ -624,6 +671,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Item,
     category: 'A',
     specialId: 10,
+    image: require('@/assets/items/blue-gemstone.png'),
   },
   {
     id: '61',
@@ -635,6 +683,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Item,
     category: 'A',
     specialId: 8,
+    image: require('@/assets/items/blue-herb.png'),
   },
   {
     id: '62',
@@ -646,6 +695,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Item,
     category: 'A',
     specialId: 9,
+    image: require('@/assets/items/yellow-gemstone.png'),
   },
   {
     id: '63',
@@ -656,6 +706,7 @@ export const ITEMS: Item[] = [
     expansion: 'Bleak Outpost',
     itemType: ItemType.Key,
     category: 'B',
+    image: require('@/assets/items/003-key.png'),
   },
   {
     id: '64',
@@ -667,6 +718,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Key,
     category: 'B',
     specialId: 6,
+    image: require('@/assets/items/aqua-ring-key.png'),
   },
   {
     id: '65',
@@ -677,6 +729,7 @@ export const ITEMS: Item[] = [
     expansion: 'Bleak Outpost',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/crank.png'),
   },
   {
     id: '66',
@@ -687,6 +740,7 @@ export const ITEMS: Item[] = [
     expansion: 'Bleak Outpost',
     itemType: ItemType.Ammunition,
     category: 'B',
+    image: require('@/assets/items/incendiary-rounds.png'),
   },
   {
     id: '67',
@@ -697,6 +751,7 @@ export const ITEMS: Item[] = [
     expansion: 'Bleak Outpost',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/insect-spray.png'),
   },
   {
     id: '68',
@@ -707,6 +762,7 @@ export const ITEMS: Item[] = [
     expansion: 'Bleak Outpost',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/kerosene-container.png'),
   },
   {
     id: '69',
@@ -717,16 +773,18 @@ export const ITEMS: Item[] = [
     expansion: 'Bleak Outpost',
     itemType: ItemType.Key,
     category: 'B',
+    image: require('@/assets/items/old-key.png'),
   },
   {
     id: '70',
-    name: 'Self-Defence Gun',
+    name: 'Self-Defense Gun',
     type: 'Item',
     game: GameVersion.RE1,
     quantity: 1,
     expansion: 'Bleak Outpost',
     itemType: ItemType.Defensive,
     category: 'B',
+    image: require('@/assets/items/self-defense-gun.png'),
   },
   {
     id: '71',
@@ -737,6 +795,7 @@ export const ITEMS: Item[] = [
     expansion: 'Bleak Outpost',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/unprinted-book.png'),
   },
   {
     id: '72',
@@ -748,20 +807,10 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Item,
     category: 'B',
     specialId: 7,
+    image: require('@/assets/items/v-jolt.png'),
   },
 
   // ==================== INTO THE DARKNESS ====================
-  {
-    id: '73',
-    name: 'Blue Herb',
-    type: 'Item',
-    game: GameVersion.RE1,
-    quantity: 2,
-    expansion: 'Into The Darkness',
-    itemType: ItemType.Item,
-    category: 'A',
-    specialId: 8,
-  },
   {
     id: '74',
     name: 'Stone & Metal Object',
@@ -772,6 +821,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Item,
     category: 'A',
     specialId: 11,
+    image: require('@/assets/items/stone-and-metal-object.png'),
   },
   {
     id: '75',
@@ -782,6 +832,7 @@ export const ITEMS: Item[] = [
     expansion: 'Into The Darkness',
     itemType: ItemType.Ammunition,
     category: 'B',
+    image: require('@/assets/items/acid-rounds.png'),
   },
   {
     id: '76',
@@ -793,6 +844,7 @@ export const ITEMS: Item[] = [
     itemType: ItemType.Item,
     category: 'B',
     specialId: 8,
+    image: require('@/assets/items/charged-battery.png'),
   },
   {
     id: '77',
@@ -803,6 +855,7 @@ export const ITEMS: Item[] = [
     expansion: 'Into The Darkness',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/kerosene-container.png'),
   },
   {
     id: '78',
@@ -813,6 +866,7 @@ export const ITEMS: Item[] = [
     expansion: 'Into The Darkness',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/metal-object.png'),
   },
   {
     id: '79',
@@ -823,6 +877,7 @@ export const ITEMS: Item[] = [
     expansion: 'Into The Darkness',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/tome.png'),
   },
   {
     id: '80',
@@ -833,6 +888,7 @@ export const ITEMS: Item[] = [
     expansion: 'Into The Darkness',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/tome.png'),
   },
   {
     id: '81',
@@ -843,6 +899,7 @@ export const ITEMS: Item[] = [
     expansion: 'Into The Darkness',
     itemType: ItemType.Item,
     category: 'B',
+    image: require('@/assets/items/tome.png'),
   },
   {
     id: '82',
@@ -853,6 +910,7 @@ export const ITEMS: Item[] = [
     expansion: 'Into The Darkness',
     itemType: ItemType.Item,
     category: 'C',
+    image: require('@/assets/items/charged-battery.png'),
   },
   {
     id: '83',
@@ -863,6 +921,7 @@ export const ITEMS: Item[] = [
     expansion: 'Into The Darkness',
     itemType: ItemType.Item,
     category: 'C',
+    image: require('@/assets/items/death-mask-4.png'),
   },
   {
     id: '84',
@@ -873,20 +932,9 @@ export const ITEMS: Item[] = [
     expansion: 'Into The Darkness',
     itemType: ItemType.Item,
     category: 'C',
+    image: require('@/assets/items/stone-ring.png'),
   },
-
   // ==================== DIRECTOR'S CUT ====================
-  {
-    id: '85',
-    name: 'Blue Herb',
-    type: 'Item',
-    game: GameVersion.RE1,
-    quantity: 2,
-    expansion: "Director's Cut",
-    itemType: ItemType.Item,
-    category: 'A',
-    specialId: 8,
-  },
   {
     id: '86',
     name: 'Green Herb',
@@ -896,6 +944,7 @@ export const ITEMS: Item[] = [
     expansion: "Director's Cut",
     itemType: ItemType.Item,
     category: 'S',
+    image: require('@/assets/items/green-herb.png'),
   },
   {
     id: '87',
@@ -906,6 +955,7 @@ export const ITEMS: Item[] = [
     expansion: "Director's Cut",
     itemType: ItemType.Defensive,
     category: 'S',
+    image: require('@/assets/items/grenade.png'),
   },
   {
     id: '88',
@@ -916,16 +966,7 @@ export const ITEMS: Item[] = [
     expansion: "Director's Cut",
     itemType: ItemType.Weapon,
     category: 'S',
-  },
-  {
-    id: '89',
-    name: 'Lighter',
-    type: 'Item',
-    game: GameVersion.RE1,
-    quantity: 1,
-    expansion: "Director's Cut",
-    itemType: ItemType.Item,
-    category: 'S',
+    image: require('@/assets/items/knife.png'),
   },
   {
     id: '90',
@@ -936,5 +977,6 @@ export const ITEMS: Item[] = [
     expansion: "Director's Cut",
     itemType: ItemType.Weapon,
     category: 'S',
+    image: require('@/assets/items/knife.png'),
   },
 ];

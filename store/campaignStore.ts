@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-  ActiveCharacter,
   Campaign,
+  CampaignCharacter,
   Card,
   CardType,
   CharacterHealth,
@@ -14,7 +14,6 @@ import {
   Scenario,
   ScenarioStatus,
 } from '@/types';
-import { CharacterProfile } from '@/data/RE1/characters';
 import { CreateCampaignForm } from '@/components/screens/CreateCampaignModal';
 import { getGameScenarios } from '@/data';
 import { DANGER_LEVEL_CONFIG } from '@/constants/dangerLevel';
@@ -45,17 +44,16 @@ interface CampaignStore {
   updateScenarioStatus: (scenarioId: string, status: ScenarioStatus) => void;
   unlockScenario: (scenarioId: string) => void;
   toggleExpansion: (expansion: Exclude<GameExpansion, 'Core Box'>) => void;
-  updateActiveCharacterHealth: (characterId: string, health: CharacterHealth) => void;
-  updateActiveCharacterKerosene: (characterId: string, kerosene: number) => void;
-  addActiveCharacter: (activeCharacter: ActiveCharacter) => void;
-  removeActiveCharacter: (characterId: string) => void;
-  moveCharacterToReserve: (characterId: string) => void;
-  addReserveCharacter: (character: CharacterProfile) => void;
-  addItemToActiveCharacter: (characterId: string, item: Item) => void;
-  removeItemFromActiveCharacter: (characterId: string, itemId: string, quantity: number) => void;
-  updateActiveCharacterInventory: (characterId: string, item: Item) => void;
-  resetActiveCharacterInventory: (characterId: string) => void;
-  updateActiveCharacterPlayerName: (characterId: string, realName: string) => void;
+  updateCharacterHealth: (characterId: string, health: CharacterHealth) => void;
+  updateCharacterKerosene: (characterId: string, kerosene: number) => void;
+  addCharacter: (character: CampaignCharacter) => void;
+  removeCharacter: (characterId: string) => void;
+  setCharacterReserved: (characterId: string, isInTheReserve: boolean) => void;
+  addItemToCharacter: (characterId: string, item: Item) => void;
+  removeItemFromCharacter: (characterId: string, itemId: string, quantity: number) => void;
+  updateCharacterInventory: (characterId: string, item: Item) => void;
+  resetCharacterInventory: (characterId: string) => void;
+  updateCharacterPlayerName: (characterId: string, realName: string) => void;
   addItemToBox: (item: Item) => void;
   removeFromItemsBox: (itemId: string, quantity: number) => void;
   updateItemAmmunition: (itemId: string, ammunition: number) => void;
@@ -88,8 +86,7 @@ export const useCampaignStore = create<CampaignStore>()(
             game,
             difficulty: formData.difficulty,
             dangerLevel: 0, // Starts at zero threat
-            activeCharacters: [], // Empty roster at the beginning
-            reserveCharacters: [],
+            characters: [], // Empty roster at the beginning
             itemsBox: [], // Inventory box starts empty
             scenarios,
             enabledExpansions: ['Core Box'],
@@ -169,52 +166,50 @@ export const useCampaignStore = create<CampaignStore>()(
           }),
         })),
 
-      updateActiveCharacterHealth: (characterId, newHealth) =>
+      updateCharacterHealth: (characterId, newHealth) =>
         set(state => ({
           allCampaigns: state.allCampaigns.map(c => {
             if (c.id !== state.currentCampaignId) return c;
             return {
               ...c,
-              activeCharacters: c.activeCharacters.map(ac =>
-                ac.character.id === characterId ? { ...ac, health: newHealth } : ac
+              characters: c.characters.map(ch =>
+                ch.character.id === characterId ? { ...ch, health: newHealth } : ch
               ),
             };
           }),
         })),
 
-      updateActiveCharacterKerosene: (characterId, kerosene) =>
+      updateCharacterKerosene: (characterId, kerosene) =>
         set(state => ({
           allCampaigns: state.allCampaigns.map(c => {
             if (c.id !== state.currentCampaignId) return c;
             return {
               ...c,
-              activeCharacters: c.activeCharacters.map(ac =>
-                ac.character.id === characterId
-                  ? { ...ac, kerosene: Math.min(KEROSENE_MAX, Math.max(0, kerosene)) }
-                  : ac
+              characters: c.characters.map(ch =>
+                ch.character.id === characterId
+                  ? { ...ch, kerosene: Math.min(KEROSENE_MAX, Math.max(0, kerosene)) }
+                  : ch
               ),
             };
           }),
         })),
 
-      addActiveCharacter: activeCharacter =>
+      addCharacter: character =>
         set(state => ({
           allCampaigns: state.allCampaigns.map(c => {
             if (c.id !== state.currentCampaignId) return c;
             return {
               ...c,
-              activeCharacters: [...c.activeCharacters, activeCharacter],
+              characters: [...c.characters, character],
             };
           }),
         })),
 
-      removeActiveCharacter: characterId =>
+      removeCharacter: characterId =>
         set(state => ({
           allCampaigns: state.allCampaigns.map(c => {
             if (c.id !== state.currentCampaignId) return c;
-            const characterToRemove = c.activeCharacters.find(
-              ac => ac.character.id === characterId
-            );
+            const characterToRemove = c.characters.find(ch => ch.character.id === characterId);
             if (!characterToRemove) return c;
 
             const newItemsBox = characterToRemove.inventory.reduce((box, item) => {
@@ -228,116 +223,141 @@ export const useCampaignStore = create<CampaignStore>()(
 
             return {
               ...c,
-              activeCharacters: c.activeCharacters.filter(ac => ac.character.id !== characterId),
+              characters: c.characters.filter(ch => ch.character.id !== characterId),
               itemsBox: newItemsBox,
             };
           }),
         })),
 
-      moveCharacterToReserve: characterId =>
+      setCharacterReserved: (characterId, isInTheReserve) =>
         set(state => ({
           allCampaigns: state.allCampaigns.map(c => {
             if (c.id !== state.currentCampaignId) return c;
-            const characterToMove = c.activeCharacters.find(ac => ac.character.id === characterId);
-            if (!characterToMove) return c;
+            const target = c.characters.find(ch => ch.character.id === characterId);
+            // Entries using the special Reserve-only card can never leave the Reserve.
+            if (!target || target.isReserveOnly) return c;
+
+            if (isInTheReserve) {
+              const newItemsBox = target.inventory.reduce((box, item) => {
+                const existingItem = box.find(i => i.id === item.id);
+                return existingItem
+                  ? box.map(i =>
+                      i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i
+                    )
+                  : [...box, item];
+              }, c.itemsBox);
+
+              return {
+                ...c,
+                itemsBox: newItemsBox,
+                characters: c.characters.map(ch =>
+                  ch.character.id === characterId
+                    ? {
+                        ...ch,
+                        isInTheReserve: true,
+                        controlledBy: { ...ch.controlledBy, realName: '' },
+                        inventory: [],
+                        kerosene: undefined,
+                        health: { ...ch.health, isPoisoned: false },
+                      }
+                    : ch
+                ),
+              };
+            }
 
             return {
               ...c,
-              activeCharacters: c.activeCharacters.filter(ac => ac.character.id !== characterId),
-              reserveCharacters: [...c.reserveCharacters, characterToMove.character],
-            };
-          }),
-        })),
-
-      addReserveCharacter: character =>
-        set(state => ({
-          allCampaigns: state.allCampaigns.map(c => {
-            if (c.id !== state.currentCampaignId) return c;
-            return {
-              ...c,
-              reserveCharacters: [...c.reserveCharacters, character],
-            };
-          }),
-        })),
-
-      updateActiveCharacterPlayerName: (characterId, realName) =>
-        set(state => ({
-          allCampaigns: state.allCampaigns.map(c => {
-            if (c.id !== state.currentCampaignId) return c;
-            return {
-              ...c,
-              activeCharacters: c.activeCharacters.map(ac =>
-                ac.character.id === characterId
-                  ? { ...ac, controlledBy: { ...ac.controlledBy, realName } }
-                  : ac
+              characters: c.characters.map(ch =>
+                ch.character.id === characterId
+                  ? {
+                      ...ch,
+                      isInTheReserve: false,
+                      kerosene: c.game === GameVersion.RE1 ? 0 : undefined,
+                    }
+                  : ch
               ),
             };
           }),
         })),
 
-      addItemToActiveCharacter: (characterId, item) =>
+      updateCharacterPlayerName: (characterId, realName) =>
         set(state => ({
           allCampaigns: state.allCampaigns.map(c => {
             if (c.id !== state.currentCampaignId) return c;
             return {
               ...c,
-              activeCharacters: c.activeCharacters.map(ac => {
-                if (ac.character.id !== characterId) return ac;
-                const existingItem = ac.inventory.find(i => i.id === item.id);
+              characters: c.characters.map(ch =>
+                ch.character.id === characterId
+                  ? { ...ch, controlledBy: { ...ch.controlledBy, realName } }
+                  : ch
+              ),
+            };
+          }),
+        })),
+
+      addItemToCharacter: (characterId, item) =>
+        set(state => ({
+          allCampaigns: state.allCampaigns.map(c => {
+            if (c.id !== state.currentCampaignId) return c;
+            return {
+              ...c,
+              characters: c.characters.map(ch => {
+                if (ch.character.id !== characterId) return ch;
+                const existingItem = ch.inventory.find(i => i.id === item.id);
                 const newInventory = existingItem
-                  ? ac.inventory.map(i =>
+                  ? ch.inventory.map(i =>
                       i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i
                     )
-                  : [...ac.inventory, item];
-                return { ...ac, inventory: newInventory };
+                  : [...ch.inventory, item];
+                return { ...ch, inventory: newInventory };
               }),
             };
           }),
         })),
 
-      removeItemFromActiveCharacter: (characterId, itemId, quantity) =>
+      removeItemFromCharacter: (characterId, itemId, quantity) =>
         set(state => ({
           allCampaigns: state.allCampaigns.map(c => {
             if (c.id !== state.currentCampaignId) return c;
             return {
               ...c,
-              activeCharacters: c.activeCharacters.map(ac => {
-                if (ac.character.id !== characterId) return ac;
-                const newInventory = ac.inventory
+              characters: c.characters.map(ch => {
+                if (ch.character.id !== characterId) return ch;
+                const newInventory = ch.inventory
                   .map(i => (i.id === itemId ? { ...i, quantity: i.quantity - quantity } : i))
                   .filter(i => i.quantity > 0);
-                return { ...ac, inventory: newInventory };
+                return { ...ch, inventory: newInventory };
               }),
             };
           }),
         })),
 
-      updateActiveCharacterInventory: (characterId, item) =>
+      updateCharacterInventory: (characterId, item) =>
         set(state => ({
           allCampaigns: state.allCampaigns.map(c => {
             if (c.id !== state.currentCampaignId) return c;
             return {
               ...c,
-              activeCharacters: c.activeCharacters.map(ac => {
-                if (ac.character.id !== characterId) return ac;
-                const itemExists = ac.inventory.some(i => i.id === item.id);
+              characters: c.characters.map(ch => {
+                if (ch.character.id !== characterId) return ch;
+                const itemExists = ch.inventory.some(i => i.id === item.id);
                 const newInventory = itemExists
-                  ? ac.inventory.map(i => (i.id === item.id ? item : i))
-                  : [...ac.inventory, item];
-                return { ...ac, inventory: newInventory };
+                  ? ch.inventory.map(i => (i.id === item.id ? item : i))
+                  : [...ch.inventory, item];
+                return { ...ch, inventory: newInventory };
               }),
             };
           }),
         })),
 
-      resetActiveCharacterInventory: characterId =>
+      resetCharacterInventory: characterId =>
         set(state => ({
           allCampaigns: state.allCampaigns.map(c => {
             if (c.id !== state.currentCampaignId) return c;
             return {
               ...c,
-              activeCharacters: c.activeCharacters.map(ac =>
-                ac.character.id === characterId ? { ...ac, inventory: [] } : ac
+              characters: c.characters.map(ch =>
+                ch.character.id === characterId ? { ...ch, inventory: [] } : ch
               ),
             };
           }),
@@ -460,18 +480,69 @@ export const useCampaignStore = create<CampaignStore>()(
     {
       name: 're-campaign-store',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 1,
+      version: 4,
       migrate: persistedState => {
-        const state = persistedState as Partial<CampaignStore> | undefined;
+        const state = persistedState as Record<string, unknown> | undefined;
         // A foreign or much-older persisted blob may be missing allCampaigns
         // entirely — fall back to an empty campaign list instead of throwing.
-        const allCampaigns = Array.isArray(state?.allCampaigns) ? state.allCampaigns : [];
+        const rawCampaigns = state?.allCampaigns;
+        const allCampaigns = Array.isArray(rawCampaigns) ? rawCampaigns : [];
+
         return {
           ...state,
-          allCampaigns: allCampaigns.map(c => ({
-            ...c,
-            enabledExpansions: c?.enabledExpansions ?? ['Core Box'],
-          })),
+          allCampaigns: allCampaigns.map((c: Record<string, unknown>) => {
+            // v3 already has a unified `characters` list — just backfill the v4 field.
+            if (Array.isArray(c?.characters)) {
+              return {
+                ...c,
+                enabledExpansions: c?.enabledExpansions ?? ['Core Box'],
+                characters: c.characters.map((ch: Record<string, unknown>) => ({
+                  ...ch,
+                  isReserveOnly: ch?.isReserveOnly ?? false,
+                })),
+              };
+            }
+
+            const legacyActive = Array.isArray(c?.activeCharacters) ? c.activeCharacters : [];
+            // Pre-v2 reserveCharacters were bare CharacterProfile entries;
+            // v2 wrapped them as { character, isReservedOnly }.
+            const legacyReserve = Array.isArray(c?.reserveCharacters) ? c.reserveCharacters : [];
+
+            const characters = [
+              ...legacyActive.map((ac: Record<string, unknown>) => ({
+                ...ac,
+                isInTheReserve: false,
+                isReserveOnly: false,
+              })),
+              ...legacyReserve.map((rc: unknown) => {
+                const character =
+                  rc && typeof rc === 'object' && 'character' in rc
+                    ? (rc as { character: unknown }).character
+                    : rc;
+                return {
+                  character,
+                  controlledBy: {
+                    id: `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 9)}`,
+                    realName: '',
+                  },
+                  health: { value: 5, isPoisoned: false },
+                  inventory: [],
+                  kerosene: undefined,
+                  isAdvancedVersion: false,
+                  isInTheReserve: true,
+                  isReserveOnly: false,
+                };
+              }),
+            ];
+
+            return {
+              ...c,
+              enabledExpansions: c?.enabledExpansions ?? ['Core Box'],
+              characters,
+              activeCharacters: undefined,
+              reserveCharacters: undefined,
+            };
+          }),
         } as CampaignStore;
       },
     }
