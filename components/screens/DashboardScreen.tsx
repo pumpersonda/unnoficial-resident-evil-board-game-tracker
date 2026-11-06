@@ -3,7 +3,7 @@ import { Pressable, ScrollView } from 'react-native';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
-import { Biohazard, Info, MonitorSmartphone, Moon, Plus, Sun } from 'lucide-react-native';
+import { Biohazard, Info, MonitorSmartphone, Moon, Plus, Sun, Upload } from 'lucide-react-native';
 import CampaignCard from '@/components/campain/CampaignCard';
 import CreateCampaignModal, { CreateCampaignForm } from '@/components/screens/CreateCampaignModal';
 import DisclaimerModal from '@/components/screens/DisclaimerModal';
@@ -22,6 +22,8 @@ import { useThemeStore } from '@/store/themeStore';
 import { useResolvedTheme } from '@/hooks/useResolvedTheme';
 import { THEME_COLORS } from '@/constants/theme';
 import { Campaign, ThemeMode } from '@/types';
+import { exportCampaignToFile, pickCampaignJson } from '@/utils/campaignFile';
+import { normalizeImportedCampaign } from '@/utils/campaignTransfer';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/components/navigation/types';
@@ -50,6 +52,7 @@ export default function DashboardScreen() {
   } | null>(null);
   const campaigns = useCampaignStore(state => state.allCampaigns);
   const createCampaign = useCampaignStore(state => state.createCampaign);
+  const importCampaign = useCampaignStore(state => state.importCampaign);
   const updateCampaign = useCampaignStore(state => state.updateCampaign);
   const deleteCampaign = useCampaignStore(state => state.deleteCampaign);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -127,6 +130,67 @@ export default function DashboardScreen() {
     });
   };
 
+  const showErrorToast = (title: string, description?: string) => {
+    toast.show({
+      placement: 'top',
+      render: ({ id }) => (
+        <Toast nativeID={`toast-${id}`} action="error" variant="solid">
+          <ToastTitle className="font-semibold">{title}</ToastTitle>
+          {description && <ToastDescription size="sm">{description}</ToastDescription>}
+        </Toast>
+      ),
+    });
+  };
+
+  const handleExportCampaign = async (id: string) => {
+    const campaign = campaigns.find(c => c.id === id);
+    if (!campaign) return;
+
+    try {
+      await exportCampaignToFile(campaign);
+    } catch {
+      showErrorToast("Couldn't export campaign", 'Please try again.');
+    }
+  };
+
+  const handleImportCampaign = async () => {
+    let fileContent: string | null;
+    try {
+      fileContent = await pickCampaignJson();
+    } catch {
+      showErrorToast("Couldn't read file");
+      return;
+    }
+
+    if (fileContent === null) return;
+
+    let parsedJson: unknown;
+    try {
+      parsedJson = JSON.parse(fileContent);
+    } catch {
+      showErrorToast("This file isn't valid JSON");
+      return;
+    }
+
+    const normalized = normalizeImportedCampaign(parsedJson);
+    if ('error' in normalized) {
+      showErrorToast(normalized.error);
+      return;
+    }
+
+    importCampaign(normalized);
+
+    toast.show({
+      placement: 'top',
+      render: ({ id: toastId }) => (
+        <Toast nativeID={`toast-${toastId}`} action="success" variant="solid">
+          <ToastTitle className="font-semibold text-success">Campaign imported</ToastTitle>
+          <ToastDescription size="sm">{`"${normalized.name}" is ready to play.`}</ToastDescription>
+        </Toast>
+      ),
+    });
+  };
+
   const handleCycleTheme = () => {
     setThemeMode(NEXT_THEME_MODE[themeMode]);
   };
@@ -174,6 +238,7 @@ export default function DashboardScreen() {
                 dangerLevel={campaign.dangerLevel}
                 onPress={handleOpenCampaign}
                 onEdit={handleEditCampaign}
+                onDownload={handleExportCampaign}
                 onDelete={handleRequestDeleteCampaign}
               />
             ))}
@@ -192,6 +257,15 @@ export default function DashboardScreen() {
           </VStack>
         )}
       </ScrollView>
+
+      {/* Secondary action - Import a previously exported campaign backup */}
+      <Pressable
+        onPress={handleImportCampaign}
+        className="absolute bottom-safe-or-10 right-24 bg-secondary w-11 h-11 rounded-full items-center justify-center shadow-lg active:opacity-80"
+        accessibilityLabel="Import campaign from file"
+      >
+        <Upload color={THEME_COLORS[resolvedTheme].foreground} size={20} />
+      </Pressable>
 
       {/* Floating Action Button - Only way to create a campaign */}
       <Pressable
