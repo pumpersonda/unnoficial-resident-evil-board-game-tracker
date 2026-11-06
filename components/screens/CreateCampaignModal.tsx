@@ -105,7 +105,7 @@ export default function CreateCampaignModal({
           </Button>
           <Button
             className="flex-1 bg-destructive active:opacity-90"
-            onPress={handleSubmit(onSubmit)}
+            onPress={() => handleSubmit(onSubmit)()}
             isDisabled={!isValid}
           >
             <ButtonText>{isEditing ? 'Save Changes' : 'Create Campaign'}</ButtonText>
